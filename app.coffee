@@ -1,6 +1,7 @@
 express = require 'express'
 cfg = require './cfg/config.js'
 Firebase = require 'firebase'
+Api = (require './lib/api.js').Api
 
 app = express()
 app.use express.bodyParser()
@@ -8,10 +9,11 @@ app.use express.cookieParser()
 
 ### Controllers ###
 firebase = new Firebase cfg.FIREBASE
+api = new Api cfg
 
 ### Routes ###  
 
-# API
+# API - Examples
 app.get '/v0/name', (req, res) ->
   name =
     first: "Brad"
@@ -39,10 +41,13 @@ app.get '/v0/social', (req, res) ->
 app.get '/:version/*', (req, res) ->
   # Anything under /version should be treated as a json object
   console.log req.params
-  res.send req.params
+  parameters = api.parseUrl req.params
+  res.send parameters
 
 # Docs
 app.get '/'
 
 ### Start the App ###
 app.listen "#{cfg.PORT}"
+
+
