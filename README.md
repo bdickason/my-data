@@ -3,10 +3,10 @@ my-data
 
 ### Create your own personal API
 
-* -Input data by hand (key/value pair) 
-* -Send us your data via API (key/value pair)
-* -Permission your data (let others access it)
-* -Graph your data
+* Input data by hand (key/value pair) 
+* Send your data via API (key/value pair)
+* Permission your data (let others access it)
+* Graph your data
 
 
 ### Example:
