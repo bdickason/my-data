@@ -14,7 +14,7 @@ Simple permissioned data store
 
 ### Example:
 
-`
+```
 public: {
   email: "dickason@gmail.com",
   name: "Brad Dickason",
@@ -35,4 +35,4 @@ private: {
     }
   ]
 }
-`
+```
