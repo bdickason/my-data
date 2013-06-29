@@ -1,9 +1,6 @@
 my-data
 =======
 
-Simple permissioned data store
-
-
 ### Create your own personal API
 
 * -Input data by hand (key/value pair) 
