@@ -22,7 +22,41 @@
   /* Routes*/
 
 
-  app.get('/', function(req, res) {});
+  app.get('/v0/name', function(req, res) {
+    var name;
+    name = {
+      first: "Brad",
+      last: "Dickason"
+    };
+    return res.send(name);
+  });
+
+  app.get('/v0/email', function(req, res) {
+    var email;
+    email = {
+      personal: "dickason@gmail.com",
+      work: "brad@shapeways.com"
+    };
+    return res.send(email);
+  });
+
+  app.get('/v0/social', function(req, res) {
+    var social;
+    social = {
+      facebook: null,
+      instagram: "bdickason",
+      twitter: "@bdickason",
+      web: "bdickason.com"
+    };
+    return res.send(social);
+  });
+
+  app.get('/:version/*', function(req, res) {
+    console.log(req.params);
+    return res.send(req.params);
+  });
+
+  app.get('/');
 
   /* Start the App*/
 
