@@ -23,8 +23,18 @@ exports.Api = class Api
         callback "Error: Data could not be saved " + err
       else
         console.log "Data saved successfully"
-        callback
+        callback()
 
+  delete: (key, callback) ->
+    firebase = new Firebase @cfg.FIREBASE + key
+    console.log key
+
+    firebase.remove (err) ->
+      if err
+        callback "Error: Data could not be deleted " + err
+      else
+        console.log "Data deleted successfully"
+        callback()
 
   parseUrl: (params) ->
     # Take URL as input (via API or www) and transform it into string that represents a JSON key

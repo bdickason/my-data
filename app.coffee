@@ -35,17 +35,29 @@ app.get '/v0/social', (req, res) ->
 
   res.send social ###
 
-# GET /version/endpoint
+# GET /version/endpoint - Anything under /version should be treated as a json object
 app.get '/:version/*', (req, res) ->
-  # Anything under /version should be treated as a json object
+  # GET a given key
   console.log req.params
   api.get req.params[0], (callback) ->
     res.send callback
 
 app.post '/:version/*', (req, res) ->
-  # Anything under version should be treated as a json object
+  # POST a value to a given key
   console.log req.params
   api.set req.params[0], req.body, (callback) ->
+    res.send callback
+
+app.put '/:version/*', (req, res) ->
+  # Update an existing key - we treat this the same as post: 'set'
+  console.log req.params
+  api.set req.params[0], req.body, (callback) ->
+    res.send callback
+
+app.delete '/:version/*', (req, res) ->
+  # Update an existing key - we treat this the same as post: 'set'
+  console.log req.params
+  api.delete req.params[0], (callback) ->
     res.send callback
 
   

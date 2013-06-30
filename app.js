@@ -62,6 +62,20 @@
     });
   });
 
+  app.put('/:version/*', function(req, res) {
+    console.log(req.params);
+    return api.set(req.params[0], req.body, function(callback) {
+      return res.send(callback);
+    });
+  });
+
+  app["delete"]('/:version/*', function(req, res) {
+    console.log(req.params);
+    return api["delete"](req.params[0], function(callback) {
+      return res.send(callback);
+    });
+  });
+
   app.get('/');
 
   /* Start the App*/
