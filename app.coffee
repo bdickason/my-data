@@ -1,6 +1,5 @@
 express = require 'express'
 cfg = require './cfg/config.js'
-Firebase = require 'firebase'
 Api = (require './lib/api.js').Api
 
 app = express()
@@ -8,12 +7,11 @@ app.use express.bodyParser()
 app.use express.cookieParser()
 
 ### Controllers ###
-firebase = new Firebase cfg.FIREBASE
 api = new Api cfg
 
 ### Routes ###  
 
-# API - Examples
+### API - Examples
 app.get '/v0/name', (req, res) ->
   name =
     first: "Brad"
@@ -35,14 +33,23 @@ app.get '/v0/social', (req, res) ->
     twitter: "@bdickason",
     web: "bdickason.com"
 
-  res.send social
+  res.send social ###
 
 # GET /version/endpoint
 app.get '/:version/*', (req, res) ->
   # Anything under /version should be treated as a json object
   console.log req.params
-  parameters = api.parseUrl req.params
-  res.send parameters
+  api.get req.params[0], (callback) ->
+    res.send callback
+
+app.post '/:version/*', (req, res) ->
+  # Anything under version should be treated as a json object
+  console.log req.params
+  api.set req.params[0], req.body, (callback) ->
+    res.send callback
+
+  
+
 
 # Docs
 app.get '/'
