@@ -12,6 +12,8 @@
 
   app.use(express["static"](__dirname + '/static'));
 
+  app.use(express.favicon());
+
   app.use(express.bodyParser());
 
   app.use(express.cookieParser());
@@ -62,7 +64,10 @@
       if (req.query.format === 'json') {
         return res.send(callback);
       } else {
+        console.log(callback);
+        console.log(req.params);
         return res.render('endpoint', {
+          params: req.params[0],
           callback: callback
         });
       }
@@ -72,40 +77,27 @@
   app.post('/:version/*', function(req, res) {
     console.log(req.params);
     return api.set(req.params[0], req.body, function(callback) {
-      if (req.query.format === 'json') {
-        return res.send(callback);
-      } else {
-        return res.render('endpoint', {
-          callback: callback
-        });
-      }
+      return res.send(callback);
     });
   });
 
   app.put('/:version/*', function(req, res) {
     console.log(req.params);
     return api.set(req.params[0], req.body, function(callback) {
-      if (req.query.format === 'json') {
-        return res.send(callback);
-      } else {
-        return res.render('endpoint', {
-          callback: callback
-        });
-      }
+      return res.send(callback);
     });
   });
 
   app["delete"]('/:version/*', function(req, res) {
     console.log(req.params);
     return api["delete"](req.params[0], function(callback) {
-      if (req.query.format === 'json') {
-        return res.send(callback);
-      } else {
-        return res.render('endpoint', {
-          callback: callback
-        });
-      }
+      return res.send(callback);
     });
+  });
+
+  app.get('/:version', function(req, res) {
+    console.log('/' + req.params.version + '/');
+    return res.redirect('/' + req.params.version + '/');
   });
 
   app.get('/', function(req, res) {

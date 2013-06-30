@@ -6,11 +6,16 @@ html(lang="en")
     title Your Data
 
   body
-    .container
+    .header
       center
         h1 JSON for the rest of us
-      p 
-        #{callback.work}
+        a(href='/v0') /
+        &nbsp;/ 
+        a(href='/v0/#{params}') #{params}
+    .container
+      center
+        
+        p !{JSON.stringify(callback)}
     #debug
       p Session: 
         =JSON.stringify(session)
