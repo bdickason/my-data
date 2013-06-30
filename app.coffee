@@ -41,36 +41,50 @@ app.get '/:version/*', (req, res) ->
   # e.g. curl http://localhost:3000/v0/email/personal
   console.log req.params
   api.get req.params[0], (callback) ->
-    res.send callback
+    if req.query.format is 'json'
+      res.send callback
+    else
+      res.send "Template!"
 
 app.post '/:version/*', (req, res) ->
   # POST a value to a given key
-  # e.g. curl -X POST -H "Content-Type: application/json" -d '{"personal": "dickason@gmail.com", "work": "brad1@shapeways.com"}' http://localhost:3000/v0/email/work
+  # e.g. curl -X POST -H "Content-Type: application/json" -d '{"personal": "dickason@gmail.com", "work": "brad1@shapeways.com"}' http://localhost:3000/v0/email
   console.log req.params
   api.set req.params[0], req.body, (callback) ->
-    res.send callback
+    if req.query.format is 'json'
+          res.send callback
+        else
+          res.send "Template!"
 
 app.put '/:version/*', (req, res) ->
   # Update an existing key - we treat this the same as post: 'set'
-  # e.g. curl -X PUT -H "Content-Type: application/json" -d '{"personal": "dickason@gmail.com", "work": "brad1@shapeways.com"}' http://localhost:3000/v0/email/work
+  # e.g. curl -X PUT -H "Content-Type: application/json" -d '{"personal": "dickason@gmail.com", "work": "brad1@shapeways.com"}' http://localhost:3000/v0/email
   console.log req.params
   api.set req.params[0], req.body, (callback) ->
-    res.send callback
+    if req.query.format is 'json'
+          res.send callback
+        else
+          res.send "Template!"
 
 app.delete '/:version/*', (req, res) ->
   # Update an existing key - we treat this the same as post: 'set'
   # e.g. curl -X DELETE http://localhost:3000/v0/email/work
   console.log req.params
   api.delete req.params[0], (callback) ->
-    res.send callback
+    if req.query.format is 'json'
+          res.send callback
+        else
+          res.send "Template!"
 
   
 
 
 # Docs
-app.get '/'
+app.get '/', (req, res) ->
+  if req.query.format is 'json'
+      res.send "Your home goes here!"
+    else
+      res.send "Template!"
 
 ### Start the App ###
 app.listen "#{cfg.PORT}"
-
-

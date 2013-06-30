@@ -51,32 +51,54 @@
   app.get('/:version/*', function(req, res) {
     console.log(req.params);
     return api.get(req.params[0], function(callback) {
-      return res.send(callback);
+      if (req.query.format === 'json') {
+        return res.send(callback);
+      } else {
+        return res.send("Template!");
+      }
     });
   });
 
   app.post('/:version/*', function(req, res) {
     console.log(req.params);
     return api.set(req.params[0], req.body, function(callback) {
-      return res.send(callback);
+      if (req.query.format === 'json') {
+        return res.send(callback);
+      } else {
+        return res.send("Template!");
+      }
     });
   });
 
   app.put('/:version/*', function(req, res) {
     console.log(req.params);
     return api.set(req.params[0], req.body, function(callback) {
-      return res.send(callback);
+      if (req.query.format === 'json') {
+        return res.send(callback);
+      } else {
+        return res.send("Template!");
+      }
     });
   });
 
   app["delete"]('/:version/*', function(req, res) {
     console.log(req.params);
     return api["delete"](req.params[0], function(callback) {
-      return res.send(callback);
+      if (req.query.format === 'json') {
+        return res.send(callback);
+      } else {
+        return res.send("Template!");
+      }
     });
   });
 
-  app.get('/');
+  app.get('/', function(req, res) {
+    if (req.query.format === 'json') {
+      return res.send("Your home goes here!");
+    } else {
+      return res.send("Template!");
+    }
+  });
 
   /* Start the App*/
 
