@@ -3,8 +3,13 @@ cfg = require './cfg/config.js'
 Api = (require './lib/api.js').Api
 
 app = express()
+app.use express.static __dirname + '/static'
 app.use express.bodyParser()
 app.use express.cookieParser()
+app.set 'views', __dirname + '/views'
+app.set 'view engine', 'jade'
+app.use app.router
+
 
 ### Controllers ###
 api = new Api cfg
@@ -35,7 +40,7 @@ app.get '/v0/social', (req, res) ->
 
   res.send social ###
 
-# GET /version/endpoint - Anything under /version should be treated as a json object
+
 app.get '/:version/*', (req, res) ->
   # GET a given key
   # e.g. curl http://localhost:3000/v0/email/personal
@@ -44,7 +49,7 @@ app.get '/:version/*', (req, res) ->
     if req.query.format is 'json'
       res.send callback
     else
-      res.send "Template!"
+      res.render 'endpoint', { callback: callback }
 
 app.post '/:version/*', (req, res) ->
   # POST a value to a given key
@@ -52,9 +57,9 @@ app.post '/:version/*', (req, res) ->
   console.log req.params
   api.set req.params[0], req.body, (callback) ->
     if req.query.format is 'json'
-          res.send callback
-        else
-          res.send "Template!"
+      res.send callback
+    else
+      res.render 'endpoint', { callback: callback }
 
 app.put '/:version/*', (req, res) ->
   # Update an existing key - we treat this the same as post: 'set'
@@ -62,9 +67,9 @@ app.put '/:version/*', (req, res) ->
   console.log req.params
   api.set req.params[0], req.body, (callback) ->
     if req.query.format is 'json'
-          res.send callback
-        else
-          res.send "Template!"
+      res.send callback
+    else
+      res.render 'endpoint', { callback: callback }
 
 app.delete '/:version/*', (req, res) ->
   # Update an existing key - we treat this the same as post: 'set'
@@ -72,9 +77,9 @@ app.delete '/:version/*', (req, res) ->
   console.log req.params
   api.delete req.params[0], (callback) ->
     if req.query.format is 'json'
-          res.send callback
-        else
-          res.send "Template!"
+      res.send callback
+    else
+      res.render 'endpoint', { callback: callback }
 
   
 
@@ -84,7 +89,7 @@ app.get '/', (req, res) ->
   if req.query.format is 'json'
       res.send "Your home goes here!"
     else
-      res.send "Template!"
+      res.render 'index'
 
 ### Start the App ###
 app.listen "#{cfg.PORT}"

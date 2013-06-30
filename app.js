@@ -10,9 +10,17 @@
 
   app = express();
 
+  app.use(express["static"](__dirname + '/static'));
+
   app.use(express.bodyParser());
 
   app.use(express.cookieParser());
+
+  app.set('views', __dirname + '/views');
+
+  app.set('view engine', 'jade');
+
+  app.use(app.router);
 
   /* Controllers*/
 
@@ -54,7 +62,9 @@
       if (req.query.format === 'json') {
         return res.send(callback);
       } else {
-        return res.send("Template!");
+        return res.render('endpoint', {
+          callback: callback
+        });
       }
     });
   });
@@ -65,7 +75,9 @@
       if (req.query.format === 'json') {
         return res.send(callback);
       } else {
-        return res.send("Template!");
+        return res.render('endpoint', {
+          callback: callback
+        });
       }
     });
   });
@@ -76,7 +88,9 @@
       if (req.query.format === 'json') {
         return res.send(callback);
       } else {
-        return res.send("Template!");
+        return res.render('endpoint', {
+          callback: callback
+        });
       }
     });
   });
@@ -87,7 +101,9 @@
       if (req.query.format === 'json') {
         return res.send(callback);
       } else {
-        return res.send("Template!");
+        return res.render('endpoint', {
+          callback: callback
+        });
       }
     });
   });
@@ -96,7 +112,7 @@
     if (req.query.format === 'json') {
       return res.send("Your home goes here!");
     } else {
-      return res.send("Template!");
+      return res.render('index');
     }
   });
 
