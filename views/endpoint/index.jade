@@ -10,8 +10,10 @@ html(lang="en")
       center
         h1 JSON for the rest of us
         a(href='/v0') /
-        &nbsp;/ 
-        a(href='/v0/#{params}') #{params}
+        each value in params
+          &nbsp;/ 
+          a(href='/v0/#{value}') #{value}
+
     .container
       center
         

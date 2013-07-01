@@ -66,9 +66,11 @@
       } else {
         console.log(callback);
         console.log(req.params);
+        console.log(api.parseUrl(req.params[0]));
         return res.render('endpoint', {
-          params: req.params[0],
-          callback: callback
+          params: api.parseUrl(req.params[0], {
+            callback: callback
+          })
         });
       }
     });

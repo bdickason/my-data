@@ -37,5 +37,5 @@ exports.Api = class Api
         callback()
 
   parseUrl: (params) ->
-    # Take URL as input (via API or www) and transform it into string that represents a JSON key
-    return params[0].replace /\//g, '.' # /g Replaces all occurances (global)
+    # Take URL as input (via API or www) and transform it into array of keys
+    return params.split '/' 
