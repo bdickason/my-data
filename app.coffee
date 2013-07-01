@@ -54,7 +54,7 @@ app.get '/:version/*', (req, res) ->
       console.log callback
       console.log req.params
       console.log api.parseUrl req.params[0]
-      res.render 'endpoint', { params: api.parseUrl req.params[0], callback: callback }
+      res.render 'endpoint', { params: api.parseUrl(req.params[0]), callback: callback }
 
 app.post '/:version/*', (req, res) ->
   # POST a value to a given key
