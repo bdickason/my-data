@@ -4,7 +4,7 @@
     Assertions: Should (https://github.com/visionmedia/should.js/)
 ###
 
-Api = (require '../lib/api.js').Api
+Api = (require '../server/api.js').Api
 cfg = require '../cfg/config.js'
 should = require 'should'
 
@@ -19,9 +19,9 @@ describe 'API parseUrl - Parameter Parsing', ->
     _parameters = ['name']  # Expects array of strings.
 
     # Expected Output
-    parametersExpected = 'name'
+    parametersExpected = ['name']
 
-    parameters = api.parseUrl _parameters
+    parameters = api.parseUrl _parameters[0]
 
     parameters.should.eql parametersExpected
     done()
@@ -31,9 +31,9 @@ describe 'API parseUrl - Parameter Parsing', ->
     _parameters = ['name/first']  # Expects array of strings.
 
     # Expected Output
-    parametersExpected = 'name.first'
+    parametersExpected = ['name', 'first']
 
-    parameters = api.parseUrl _parameters
+    parameters = api.parseUrl _parameters[0]
 
     parameters.should.eql parametersExpected
     done()
@@ -43,9 +43,9 @@ describe 'API parseUrl - Parameter Parsing', ->
     _parameters = ['name/first/initial']  # Expects array of strings.
 
     # Expected Output
-    parametersExpected = 'name.first.initial'
+    parametersExpected = ['name', 'first', 'initial']
 
-    parameters = api.parseUrl _parameters
+    parameters = api.parseUrl _parameters[0]
 
     parameters.should.eql parametersExpected
     done()

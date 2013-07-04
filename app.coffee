@@ -1,6 +1,6 @@
 express = require 'express'
 cfg = require './cfg/config.js'
-Api = (require './lib/api.js').Api
+Api = (require './server/api.js').Api
 
 app = express()
 app.use express.static __dirname + '/static'
@@ -46,14 +46,10 @@ app.get '/v0/social', (req, res) ->
 app.get '/:version/*', (req, res) ->
   # GET a given key
   # e.g. curl http://localhost:3000/v0/email/personal
-  console.log req.params
   api.get req.params[0], (callback) ->
     if req.query.format is 'json'
       res.send callback
     else
-      console.log callback
-      console.log req.params
-      console.log api.parseUrl req.params[0]
       res.render 'endpoint', { params: api.parseUrl(req.params[0]), callback: callback }
 
 app.post '/:version/*', (req, res) ->

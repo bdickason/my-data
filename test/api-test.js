@@ -9,7 +9,7 @@
 (function() {
   var Api, api, cfg, should;
 
-  Api = (require('../lib/api.js')).Api;
+  Api = (require('../server/api.js')).Api;
 
   cfg = require('../cfg/config.js');
 
@@ -23,24 +23,24 @@
     it('should not replace any characters in a single string.', function(done) {
       var parameters, parametersExpected, _parameters;
       _parameters = ['name'];
-      parametersExpected = 'name';
-      parameters = api.parseUrl(_parameters);
+      parametersExpected = ['name'];
+      parameters = api.parseUrl(_parameters[0]);
       parameters.should.eql(parametersExpected);
       return done();
     });
     it('should replace a single / in a string', function(done) {
       var parameters, parametersExpected, _parameters;
       _parameters = ['name/first'];
-      parametersExpected = 'name.first';
-      parameters = api.parseUrl(_parameters);
+      parametersExpected = ['name', 'first'];
+      parameters = api.parseUrl(_parameters[0]);
       parameters.should.eql(parametersExpected);
       return done();
     });
     return it('should replace a single / in a string', function(done) {
       var parameters, parametersExpected, _parameters;
       _parameters = ['name/first/initial'];
-      parametersExpected = 'name.first.initial';
-      parameters = api.parseUrl(_parameters);
+      parametersExpected = ['name', 'first', 'initial'];
+      parameters = api.parseUrl(_parameters[0]);
       parameters.should.eql(parametersExpected);
       return done();
     });
