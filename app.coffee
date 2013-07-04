@@ -5,6 +5,7 @@ Api = (require './server/api.js').Api
 app = express()
 app.use express.static __dirname + '/static'
 app.use express.favicon()
+app.use express.logger 'dev'
 app.use express.bodyParser()
 app.use express.cookieParser()
 app.set 'views', __dirname + '/views'
