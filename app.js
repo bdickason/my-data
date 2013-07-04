@@ -34,24 +34,20 @@
   /* Routes*/
 
 
-  app.get('/:version/*', api.get);
+  app.get('/api/:version/*', api.get);
 
-  app.post('/:version/*', api.set);
+  app.post('/api/:version/*', api.set);
 
-  app.put('/:version/*', api.set);
+  app.put('/api/:version/*', api.set);
 
-  app["delete"]('/:version/*', api["delete"]);
+  app["delete"]('/api/:version/*', api["delete"]);
 
-  app.get('/:version', function(req, res) {
+  app.get('/api/:version', function(req, res) {
     return res.redirect('/' + req.params.version + '/');
   });
 
-  app.get('/', function(req, res) {
-    if (req.query.format === 'json') {
-      return res.send("Your home goes here!");
-    } else {
-      return res.sendfile('index.html');
-    }
+  app.get('/*', function(req, res) {
+    return res.sendfile('index.html');
   });
 
   /* Start the App*/

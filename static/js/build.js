@@ -637,7 +637,23 @@ require.register("boot/boot.js", function(exports, require, module){
 
   page = require('page');
 
-  console.log(page);
+  /* Routes*/
+
+
+  page('/', function(ctx) {
+    console.log('Homepage');
+    return console.log(ctx);
+  });
+
+  page('/logout', function(ctx) {
+    return console.log('Logout');
+  });
+
+  page('*', function(ctx) {
+    return console.log('404');
+  });
+
+  page();
 
 }).call(this);
 

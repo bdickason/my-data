@@ -20,22 +20,18 @@ api = new Api.Api cfg
 
 # API - User-defined Endpoints
 
-app.get '/:version/*', api.get
-app.post '/:version/*', api.set
-app.put '/:version/*', api.set
-app.delete '/:version/*', api.delete
-  
-app.get '/:version', (req, res) ->
-  # Fixes the route /v0 that doesn't fit into above framework
+app.get '/api/:version/*', api.get
+app.post '/api/:version/*', api.set
+app.put '/api/:version/*', api.set
+app.delete '/api/:version/*', api.delete
+app.get '/api/:version', (req, res) ->
+  # Redirect - Fixes the route /v0 that doesn't fit into above framework
   res.redirect '/' + req.params.version + '/'
 
 
 # Main client-side Application
-app.get '/', (req, res) ->
-  if req.query.format is 'json'
-      res.send "Your home goes here!"
-    else
-      res.sendfile 'index.html'
+app.get '/*', (req, res) ->
+  res.sendfile 'index.html'
 
 ### Start the App ###
 app.listen "#{cfg.PORT}"
