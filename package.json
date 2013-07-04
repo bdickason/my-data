@@ -14,7 +14,8 @@
     "express": "3.2.5",
     "coffee-script": "1.6.2",
     "firebase": "0.5.4",
-    "jade": "0.32.0"
+    "jade": "0.32.0",
+    "component": ">= 0.16.6"
     }
   , "devDependencies": {
         "mocha": "1.10.0",
