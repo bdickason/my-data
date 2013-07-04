@@ -7,8 +7,5 @@
   ],
   "paths": [
     "client"
-  ],
-  "dependencies": {
-    "visionmedia/page.js": "*"
-  }
+  ]
 }
