@@ -29,7 +29,6 @@ exports.Api = class Api
     value = req.body
 
     firebase = new Firebase @cfg.FIREBASE + key
-    # console.log value
 
     firebase.set value, (err) ->
       if err

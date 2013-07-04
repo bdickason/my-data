@@ -43,7 +43,6 @@
   app["delete"]('/:version/*', api["delete"]);
 
   app.get('/:version', function(req, res) {
-    console.log('/' + req.params.version + '/');
     return res.redirect('/' + req.params.version + '/');
   });
 

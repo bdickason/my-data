@@ -27,11 +27,10 @@ app.delete '/:version/*', api.delete
   
 app.get '/:version', (req, res) ->
   # Fixes the route /v0 that doesn't fit into above framework
-  console.log '/' + req.params.version + '/'
   res.redirect '/' + req.params.version + '/'
 
 
-# Main Application
+# Main client-side Application
 app.get '/', (req, res) ->
   if req.query.format is 'json'
       res.send "Your home goes here!"
