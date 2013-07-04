@@ -19,6 +19,7 @@
     Api.prototype.get = function(req, res) {
       var firebase, key;
       key = req.params[0];
+      console.log(req.params);
       firebase = new Firebase(this.cfg.FIREBASE + key);
       return firebase.on('value', function(data) {
         if (data.val() === null) {

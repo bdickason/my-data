@@ -9,6 +9,7 @@ exports.Api = class Api
     # GET a given key
     # e.g. curl http://localhost:3000/v0/email/personal
     key = req.params[0]
+    console.log req.params
 
     firebase = new Firebase @cfg.FIREBASE + key
 

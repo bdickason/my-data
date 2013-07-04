@@ -19,6 +19,78 @@
 
   beforeEach(function() {});
 
+  describe('API GET - Get a given key', function() {
+    before(function() {
+      var _request;
+      _request = {
+        params: ['email'],
+        body: {
+          "personal": "dickason@gmail.com",
+          "work": "brad1@shapeways.com"
+        }
+      };
+      return api.set(_request);
+    });
+    it('should accept a request for no parameters (/)', function(done) {
+      var _req, _res;
+      _req = {
+        params: ['']
+      };
+      _res = {
+        json: function(status, data) {
+          status.should.equal(200);
+          data.should.not.be["null"];
+          console.log(data);
+          data.should.be.a('object');
+          return done();
+        },
+        send: function(status, data) {
+          status.should.not.equal(404);
+          return done();
+        }
+      };
+      return api.get(_req, _res);
+    });
+    it('should accept a request for one parameter (email)', function(done) {
+      var _req, _res;
+      _req = {
+        params: ['email']
+      };
+      _res = {
+        json: function(status, data) {
+          status.should.equal(200);
+          data.should.not.be["null"];
+          data.should.be.a('object');
+          return done();
+        },
+        send: function(status, data) {
+          status.should.not.equal(404);
+          return done();
+        }
+      };
+      return api.get(_req, _res);
+    });
+    return it('should accept a request for many parameters (email/personal)', function(done) {
+      var _req, _res;
+      _req = {
+        params: ['email/personal']
+      };
+      _res = {
+        json: function(status, data) {
+          status.should.equal(200);
+          data.should.not.be["null"];
+          data.should.be.a('string');
+          return done();
+        },
+        send: function(status, data) {
+          status.should.not.equal(404);
+          return done();
+        }
+      };
+      return api.get(_req, _res);
+    });
+  });
+
   describe('API parseUrl - Parameter Parsing', function() {
     it('should not replace any characters in a single string.', function(done) {
       var parameters, parametersExpected, _parameters;
