@@ -10,6 +10,7 @@
 
   exports.Api = Api = (function() {
     function Api(cfg) {
+      this["delete"] = __bind(this["delete"], this);
       this.set = __bind(this.set, this);
       this.get = __bind(this.get, this);
       this.cfg = cfg;
@@ -43,16 +44,18 @@
       });
     };
 
-    Api.prototype["delete"] = function(key, callback) {
-      var firebase;
+    Api.prototype["delete"] = function(req, res) {
+      var firebase, key;
+      console.log(req.params);
+      key = req.params[0];
       firebase = new Firebase(this.cfg.FIREBASE + key);
       console.log(key);
       return firebase.remove(function(err) {
         if (err) {
-          return callback("Error: Data could not be deleted " + err);
+          return res.send(404, "Error: Data could not be deleted " + err);
         } else {
           console.log("Data deleted successfully");
-          return callback();
+          return res.json(200, key);
         }
       });
     };

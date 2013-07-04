@@ -23,14 +23,8 @@ api = new Api.Api cfg
 app.get '/:version/*', api.get
 app.post '/:version/*', api.set
 app.put '/:version/*', api.set
-
-app.delete '/:version/*', (req, res) ->
-  # Update an existing key - we treat this the same as post: 'set'
-  # e.g. curl -X DELETE http://localhost:3000/v0/email/work
-  console.log req.params
-  api.delete req.params[0], (callback) ->
-    res.send callback
-
+app.delete '/:version/*', api.delete
+  
 app.get '/:version', (req, res) ->
   # Fixes the route /v0 that doesn't fit into above framework
   console.log '/' + req.params.version + '/'

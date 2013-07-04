@@ -38,16 +38,21 @@ exports.Api = class Api
         console.log "Data saved successfully"
         res.json 200, value
 
-  delete: (key, callback) ->
+  delete: (req, res) =>
+    # DELETE a given key and its value.
+    # e.g. curl -X DELETE http://localhost:3000/v0/email/work
+    console.log req.params
+    key = req.params[0]
+
     firebase = new Firebase @cfg.FIREBASE + key
     console.log key
 
     firebase.remove (err) ->
       if err
-        callback "Error: Data could not be deleted " + err
+        res.send 404, "Error: Data could not be deleted " + err
       else
         console.log "Data deleted successfully"
-        callback()
+        res.json 200, key
 
   parseUrl: (params) ->
     # Take URL as input (via API or www) and transform it into string that represents a JSON key

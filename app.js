@@ -40,12 +40,7 @@
 
   app.put('/:version/*', api.set);
 
-  app["delete"]('/:version/*', function(req, res) {
-    console.log(req.params);
-    return api["delete"](req.params[0], function(callback) {
-      return res.send(callback);
-    });
-  });
+  app["delete"]('/:version/*', api["delete"]);
 
   app.get('/:version', function(req, res) {
     console.log('/' + req.params.version + '/');
