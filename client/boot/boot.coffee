@@ -1,3 +1,5 @@
-# page = require 'page'
+### boot - This is the core client application ###
 
-# console.log page
+page = require 'page'
+
+console.log page 
