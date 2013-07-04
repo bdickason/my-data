@@ -10,34 +10,35 @@
 
   exports.Api = Api = (function() {
     function Api(cfg) {
+      this.set = __bind(this.set, this);
       this.get = __bind(this.get, this);
       this.cfg = cfg;
     }
 
     Api.prototype.get = function(req, res) {
       var firebase, key;
-      console.log(req.params);
       key = req.params[0];
       firebase = new Firebase(this.cfg.FIREBASE + key);
       return firebase.on('value', function(data) {
         if (data.val() === null) {
           return res.send(404, "Parameter does not exist");
         } else {
-          return res.send(200, data.val());
+          return res.json(200, data.val());
         }
       });
     };
 
-    Api.prototype.set = function(key, value, callback) {
-      var firebase;
+    Api.prototype.set = function(req, res) {
+      var firebase, key, value;
+      key = req.params[0];
+      value = req.body;
       firebase = new Firebase(this.cfg.FIREBASE + key);
-      console.log(value);
       return firebase.set(value, function(err) {
         if (err) {
-          return callback("Error: Data could not be saved " + err);
+          return res.send(404, "Error: Data could not be saved " + err);
         } else {
           console.log("Data saved successfully");
-          return callback();
+          return res.json(200, value);
         }
       });
     };

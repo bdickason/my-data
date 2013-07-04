@@ -36,19 +36,9 @@
 
   app.get('/:version/*', api.get);
 
-  app.post('/:version/*', function(req, res) {
-    console.log(req.params);
-    return api.set(req.params[0], req.body, function(callback) {
-      return res.send(callback);
-    });
-  });
+  app.post('/:version/*', api.set);
 
-  app.put('/:version/*', function(req, res) {
-    console.log(req.params);
-    return api.set(req.params[0], req.body, function(callback) {
-      return res.send(callback);
-    });
-  });
+  app.put('/:version/*', api.set);
 
   app["delete"]('/:version/*', function(req, res) {
     console.log(req.params);

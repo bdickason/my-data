@@ -8,7 +8,6 @@ exports.Api = class Api
   get: (req, res) =>
     # GET a given key
     # e.g. curl http://localhost:3000/v0/email/personal
-    console.log req.params
     key = req.params[0]
 
     firebase = new Firebase @cfg.FIREBASE + key
@@ -17,18 +16,27 @@ exports.Api = class Api
       if data.val() is null
         res.send 404, "Parameter does not exist"
       else
-        res.send 200, data.val()
+        res.json 200, data.val()
 
-  set: (key, value, callback) ->
+  set: (req, res) =>
+    # POST a value to a given key
+    # e.g. curl -X POST -H "Content-Type: application/json" -d '{"personal": "dickason@gmail.com", "work": "brad1@shapeways.com"}' http://localhost:3000/v0/email
+
+    # PUT Update an existing key - we treat this the same as post: 'set'
+    # e.g. curl -X PUT -H "Content-Type: application/json" -d '{"personal": "dickason@gmail.com", "work": "brad1@shapeways.com"}' http://localhost:3000/v0/email
+
+    key = req.params[0]
+    value = req.body
+
     firebase = new Firebase @cfg.FIREBASE + key
-    console.log value
+    # console.log value
 
     firebase.set value, (err) ->
       if err
-        callback "Error: Data could not be saved " + err
+        res.send 404, "Error: Data could not be saved " + err
       else
         console.log "Data saved successfully"
-        callback()
+        res.json 200, value
 
   delete: (key, callback) ->
     firebase = new Firebase @cfg.FIREBASE + key
