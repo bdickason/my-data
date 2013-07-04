@@ -2,6 +2,13 @@
   "name": "my-data",
   "description": "Your Personal API",
   "version": "0.0.1",
-  "local": ["boot"],
-  "paths": ["client"]
+  "local": [
+    "boot"
+  ],
+  "paths": [
+    "client"
+  ],
+  "dependencies": {
+    "visionmedia/page.js": "*"
+  }
 }
