@@ -1,6 +1,6 @@
 express = require 'express'
 cfg = require './cfg/config.js'
-Api = (require './server/api.js').Api
+Api = require './server/api.js'
 
 app = express()
 app.use express.static __dirname + '/static'
@@ -14,20 +14,13 @@ app.use app.router
 
 
 ### Controllers ###
-api = new Api cfg
+api = new Api.Api cfg
 
 ### Routes ###  
 
 # API - User-defined Endpoints
 
-app.get '/:version/*', (req, res) ->
-  # GET a given key
-  # e.g. curl http://localhost:3000/v0/email/personal
-  api.get req.params[0], (callback) ->
-    if req.query.format is 'json'
-      res.send callback
-    else
-      res.render 'endpoint', { params: api.parseUrl(req.params[0]), callback: callback }
+app.get '/:version/*', api.get
 
 app.post '/:version/*', (req, res) ->
   # POST a value to a given key

@@ -6,7 +6,7 @@
 
   cfg = require('./cfg/config.js');
 
-  Api = (require('./server/api.js')).Api;
+  Api = require('./server/api.js');
 
   app = express();
 
@@ -29,23 +29,12 @@
   /* Controllers*/
 
 
-  api = new Api(cfg);
+  api = new Api.Api(cfg);
 
   /* Routes*/
 
 
-  app.get('/:version/*', function(req, res) {
-    return api.get(req.params[0], function(callback) {
-      if (req.query.format === 'json') {
-        return res.send(callback);
-      } else {
-        return res.render('endpoint', {
-          params: api.parseUrl(req.params[0]),
-          callback: callback
-        });
-      }
-    });
-  });
+  app.get('/:version/*', api.get);
 
   app.post('/:version/*', function(req, res) {
     console.log(req.params);

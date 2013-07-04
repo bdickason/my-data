@@ -1,18 +1,23 @@
 ### my-data API ###
 Firebase = require 'firebase'
 
-
 exports.Api = class Api
   constructor: (cfg) ->
     @cfg = cfg  # Save config values
 
-  get: (key, callback) ->  
+  get: (req, res) =>
+    # GET a given key
+    # e.g. curl http://localhost:3000/v0/email/personal
+    console.log req.params
+    key = req.params[0]
+
     firebase = new Firebase @cfg.FIREBASE + key
+
     firebase.on 'value', (data) ->
       if data.val() is null
-        callback "Parameter does not exist"
+        res.send 404, "Parameter does not exist"
       else
-        callback data.val()
+        res.send 200, data.val()
 
   set: (key, value, callback) ->
     firebase = new Firebase @cfg.FIREBASE + key
