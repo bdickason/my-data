@@ -15,7 +15,7 @@
     "coffee-script": "1.6.2",
     "firebase": "0.5.4",
     "jade": "0.32.0",
-    "component": ">= 0.16.6"
+    "component": "0.16.3"
     }
   , "devDependencies": {
         "mocha": "1.10.0",
