@@ -34,3 +34,10 @@ private: {
 }
 ```
 
+### Install
+
+1. Install NodeJS
+2. `npm install`
+3. `component install`
+4. `component build`
+5. `node app.js`

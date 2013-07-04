@@ -17,31 +17,7 @@ api = new Api cfg
 
 ### Routes ###  
 
-### API - Examples
-app.get '/v0/name', (req, res) ->
-  name =
-    first: "Brad"
-    last: "Dickason"
-
-  res.send name
-
-app.get '/v0/email', (req, res) ->
-  email = 
-    personal: "dickason@gmail.com",
-    work: "brad@shapeways.com"
-
-  res.send email
-
-app.get '/v0/social', (req, res) ->
-  social =
-    facebook: null,
-    instagram: "bdickason",
-    twitter: "@bdickason",
-    web: "bdickason.com"
-
-  res.send social ###
-
-
+# API - User-defined Endpoints
 
 app.get '/:version/*', (req, res) ->
   # GET a given key
@@ -79,12 +55,12 @@ app.get '/:version', (req, res) ->
   res.redirect '/' + req.params.version + '/'
 
 
-# Docs
+# Main Application
 app.get '/', (req, res) ->
   if req.query.format is 'json'
       res.send "Your home goes here!"
     else
-      res.render 'index'
+      res.sendfile 'index.html'
 
 ### Start the App ###
 app.listen "#{cfg.PORT}"

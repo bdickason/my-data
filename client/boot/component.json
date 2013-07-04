@@ -1,0 +1,9 @@
+{
+  "name": "boot",
+  "description": "bootstrap component",
+  "dependencies": {
+  },
+  "local": [],
+  "scripts": ["boot.js"],
+  "main": "boot.js"
+}

@@ -32,32 +32,6 @@
   /* Routes*/
 
 
-  /* API - Examples
-  app.get '/v0/name', (req, res) ->
-    name =
-      first: "Brad"
-      last: "Dickason"
-  
-    res.send name
-  
-  app.get '/v0/email', (req, res) ->
-    email = 
-      personal: "dickason@gmail.com",
-      work: "brad@shapeways.com"
-  
-    res.send email
-  
-  app.get '/v0/social', (req, res) ->
-    social =
-      facebook: null,
-      instagram: "bdickason",
-      twitter: "@bdickason",
-      web: "bdickason.com"
-  
-    res.send social
-  */
-
-
   app.get('/:version/*', function(req, res) {
     return api.get(req.params[0], function(callback) {
       if (req.query.format === 'json') {
@@ -101,7 +75,7 @@
     if (req.query.format === 'json') {
       return res.send("Your home goes here!");
     } else {
-      return res.render('index');
+      return res.sendfile('index.html');
     }
   });
 
