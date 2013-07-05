@@ -1,0 +1,18 @@
+{
+  "name": "rest-api",
+  "version": "0.0.1",
+  "description": "Rest API Module",
+  "keywords": [
+    "api",
+    "request",
+    "rest",
+    "restful"
+  ],
+  "scripts": [
+    "index.js"
+  ],
+  "local": [
+  "rest-endpoint"
+  ],
+  "license": "MIT"
+}

@@ -1,11 +1,10 @@
 {
   "name": "boot",
   "description": "bootstrap component",
-  "local": [],
+  "local": ["rest-api"],
   "scripts": ["boot.js"],
   "main": "boot.js",
   "dependencies": {
-    "visionmedia/page.js": "*",
-    "visionmedia/superagent": "*"
+    "visionmedia/page.js": "*"
   }
 }

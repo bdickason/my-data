@@ -1,7 +1,10 @@
 ### boot - This is the core client application ###
 
 page = require 'page'
+Api = require 'rest-api'
 
+api = new Api
+console.log api
 
 ### Routes ###
 
@@ -11,8 +14,7 @@ page '/', (ctx) ->
   console.log ctx
 
 # Endpoints
-page '/:version/*', (ctx) ->
-  console.log ctx.pathname
+page '/:version/*', api.get
 
 # Logout
 page '/logout', (ctx) ->

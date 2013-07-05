@@ -3,9 +3,15 @@
 
 
 (function() {
-  var page;
+  var Api, api, page;
 
   page = require('page');
+
+  Api = require('rest-api');
+
+  api = new Api;
+
+  console.log(api);
 
   /* Routes*/
 
@@ -15,9 +21,7 @@
     return console.log(ctx);
   });
 
-  page('/:version/*', function(ctx) {
-    return console.log(ctx.pathname);
-  });
+  page('/:version/*', api.get);
 
   page('/logout', function(ctx) {
     return console.log('Logout');
