@@ -15,6 +15,10 @@
     return console.log(ctx);
   });
 
+  page('/:version/*', function(ctx) {
+    return console.log(ctx.pathname);
+  });
+
   page('/logout', function(ctx) {
     return console.log('Logout');
   });

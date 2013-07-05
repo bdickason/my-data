@@ -5,6 +5,7 @@
   "scripts": ["boot.js"],
   "main": "boot.js",
   "dependencies": {
-    "visionmedia/page.js": "*"
+    "visionmedia/page.js": "*",
+    "visionmedia/superagent": "*"
   }
 }

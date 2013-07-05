@@ -10,6 +10,10 @@ page '/', (ctx) ->
   console.log 'Homepage'
   console.log ctx
 
+# Endpoints
+page '/:version/*', (ctx) ->
+  console.log ctx.pathname
+
 # Logout
 page '/logout', (ctx) ->
   console.log 'Logout'
