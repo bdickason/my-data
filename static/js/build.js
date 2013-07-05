@@ -1807,17 +1807,18 @@ require.register("rest-endpoint/index.js", function(exports, require, module){
   request = require('superagent');
 
   module.exports = Endpoint = (function() {
-    function Endpoint(version, key) {
+    function Endpoint(url, version, key) {
       this.version = version || 'v0';
       this.key = key || '';
-      this.url_base = 'http://localhost:3000/api';
+      this.url = url || 'http://localhost:3000/api';
+      console.log(this.url);
     }
 
     Endpoint.prototype.get = function(callback) {
       var _this = this;
       console.log("Key: " + this.key);
       console.log("Version: " + this.version);
-      return request.get("" + this.url_base + "/" + this.version + "/" + this.key, function(err, res) {
+      return request.get("" + this.url + "/" + this.version + "/" + this.key, function(err, res) {
         if (err) {
           return console.log("Error: " + err);
         } else {
@@ -1842,14 +1843,19 @@ require.register("rest-api/index.js", function(exports, require, module){
   Endpoint = require('rest-endpoint');
 
   module.exports = Api = (function() {
-    function Api() {}
+    function Api(hostname, port, prefix) {
+      this.hostname = hostname || 'localhost';
+      this.port = port || 3000;
+      this.prefix = 'api';
+      this.url = "http://" + this.hostname + ":" + this.port + "/" + this.prefix;
+    }
 
     Api.prototype.get = function(ctx) {
       var endpoint, key, version;
       console.log(ctx);
       version = ctx.params.version;
       key = ctx.params[0];
-      endpoint = new Endpoint(version, key);
+      endpoint = new Endpoint(this.url, version, key);
       return endpoint.get(function(data) {});
     };
 

@@ -5,14 +5,19 @@
   Endpoint = require('rest-endpoint');
 
   module.exports = Api = (function() {
-    function Api() {}
+    function Api(hostname, port, prefix) {
+      this.hostname = hostname || 'localhost';
+      this.port = port || 3000;
+      this.prefix = 'api';
+      this.url = "http://" + this.hostname + ":" + this.port + "/" + this.prefix;
+    }
 
     Api.prototype.get = function(ctx) {
       var endpoint, key, version;
       console.log(ctx);
       version = ctx.params.version;
       key = ctx.params[0];
-      endpoint = new Endpoint(version, key);
+      endpoint = new Endpoint(this.url, version, key);
       return endpoint.get(function(data) {});
     };
 
