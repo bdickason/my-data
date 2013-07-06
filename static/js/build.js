@@ -4887,12 +4887,11 @@ require.register("rest-api/index.js", function(exports, require, module){
         version: version,
         key: key
       });
-      console.log(endpoint);
-      console.log(endpoint.key());
       return endpoint.get(function(data) {
         var child, value, values, _results;
         console.log(data);
         values = document.querySelector('.values');
+        reactive(values, endpoint);
         _results = [];
         for (key in data) {
           value = data[key];

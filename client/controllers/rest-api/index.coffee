@@ -19,12 +19,12 @@ module.exports = class Api
       version: version, 
       key: key
 
-    console.log endpoint
-    console.log endpoint.key()
     endpoint.get (data) ->
       console.log data
       # Render view
       values = document.querySelector '.values' 
+
+      reactive values, endpoint
 
       for key, value of data
         # Construct table row for entity
