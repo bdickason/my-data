@@ -6,6 +6,9 @@
     "boot"
   ],
   "paths": [
-    "client"
+    "client",
+    "client/models",
+    "client/controllers",
+    "client/views"
   ]
 }
