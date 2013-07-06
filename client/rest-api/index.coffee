@@ -13,4 +13,7 @@ module.exports = class Api
     version = ctx.params.version
     key = ctx.params[0]
     endpoint = new Endpoint @url, version, key
+    console.log endpoint
     endpoint.get (data) ->
+      console.log data
+      # Render view

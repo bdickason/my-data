@@ -12,7 +12,8 @@
     "index.js"
   ],
   "dependencies": {
-    "visionmedia/superagent": "*"
+    "visionmedia/superagent": "*",
+    "component/model": "*"
   },
   "license": "MIT"
 }

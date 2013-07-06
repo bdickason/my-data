@@ -18,7 +18,10 @@
       version = ctx.params.version;
       key = ctx.params[0];
       endpoint = new Endpoint(this.url, version, key);
-      return endpoint.get(function(data) {});
+      console.log(endpoint);
+      return endpoint.get(function(data) {
+        return console.log(data);
+      });
     };
 
     return Api;

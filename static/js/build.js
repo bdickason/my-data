@@ -1799,19 +1799,1570 @@ request.put = function(url, data, fn){
 module.exports = request;
 
 });
+require.register("component-type/index.js", function(exports, require, module){
+
+/**
+ * toString ref.
+ */
+
+var toString = Object.prototype.toString;
+
+/**
+ * Return the type of `val`.
+ *
+ * @param {Mixed} val
+ * @return {String}
+ * @api public
+ */
+
+module.exports = function(val){
+  switch (toString.call(val)) {
+    case '[object Function]': return 'function';
+    case '[object Date]': return 'date';
+    case '[object RegExp]': return 'regexp';
+    case '[object Arguments]': return 'arguments';
+    case '[object Array]': return 'array';
+    case '[object String]': return 'string';
+  }
+
+  if (val === null) return 'null';
+  if (val === undefined) return 'undefined';
+  if (val && val.nodeType === 1) return 'element';
+  if (val === Object(val)) return 'object';
+
+  return typeof val;
+};
+
+});
+require.register("component-each/index.js", function(exports, require, module){
+
+/**
+ * Module dependencies.
+ */
+
+var type = require('type');
+
+/**
+ * HOP reference.
+ */
+
+var has = Object.prototype.hasOwnProperty;
+
+/**
+ * Iterate the given `obj` and invoke `fn(val, i)`.
+ *
+ * @param {String|Array|Object} obj
+ * @param {Function} fn
+ * @api public
+ */
+
+module.exports = function(obj, fn){
+  switch (type(obj)) {
+    case 'array':
+      return array(obj, fn);
+    case 'object':
+      if ('number' == typeof obj.length) return array(obj, fn);
+      return object(obj, fn);
+    case 'string':
+      return string(obj, fn);
+  }
+};
+
+/**
+ * Iterate string chars.
+ *
+ * @param {String} obj
+ * @param {Function} fn
+ * @api private
+ */
+
+function string(obj, fn) {
+  for (var i = 0; i < obj.length; ++i) {
+    fn(obj.charAt(i), i);
+  }
+}
+
+/**
+ * Iterate object keys.
+ *
+ * @param {Object} obj
+ * @param {Function} fn
+ * @api private
+ */
+
+function object(obj, fn) {
+  for (var key in obj) {
+    if (has.call(obj, key)) {
+      fn(key, obj[key]);
+    }
+  }
+}
+
+/**
+ * Iterate array-ish.
+ *
+ * @param {Array|Object} obj
+ * @param {Function} fn
+ * @api private
+ */
+
+function array(obj, fn) {
+  for (var i = 0; i < obj.length; ++i) {
+    fn(obj[i], i);
+  }
+}
+});
+require.register("component-to-function/index.js", function(exports, require, module){
+
+/**
+ * Expose `toFunction()`.
+ */
+
+module.exports = toFunction;
+
+/**
+ * Convert `obj` to a `Function`.
+ *
+ * @param {Mixed} obj
+ * @return {Function}
+ * @api private
+ */
+
+function toFunction(obj) {
+  switch ({}.toString.call(obj)) {
+    case '[object Object]':
+      return objectToFunction(obj);
+    case '[object Function]':
+      return obj;
+    case '[object String]':
+      return stringToFunction(obj);
+    case '[object RegExp]':
+      return regexpToFunction(obj);
+    default:
+      return defaultToFunction(obj);
+  }
+}
+
+/**
+ * Default to strict equality.
+ *
+ * @param {Mixed} val
+ * @return {Function}
+ * @api private
+ */
+
+function defaultToFunction(val) {
+  return function(obj){
+    return val === obj;
+  }
+}
+
+/**
+ * Convert `re` to a function.
+ *
+ * @param {RegExp} re
+ * @return {Function}
+ * @api private
+ */
+
+function regexpToFunction(re) {
+  return function(obj){
+    return re.test(obj);
+  }
+}
+
+/**
+ * Convert property `str` to a function.
+ *
+ * @param {String} str
+ * @return {Function}
+ * @api private
+ */
+
+function stringToFunction(str) {
+  // immediate such as "> 20"
+  if (/^ *\W+/.test(str)) return new Function('_', 'return _ ' + str);
+
+  // properties such as "name.first" or "age > 18"
+  return new Function('_', 'return _.' + str);
+}
+
+/**
+ * Convert `object` to a function.
+ *
+ * @param {Object} object
+ * @return {Function}
+ * @api private
+ */
+
+function objectToFunction(obj) {
+  var match = {}
+  for (var key in obj) {
+    match[key] = typeof obj[key] === 'string'
+      ? defaultToFunction(obj[key])
+      : toFunction(obj[key])
+  }
+  return function(val){
+    if (typeof val !== 'object') return false;
+    for (var key in match) {
+      if (!(key in val)) return false;
+      if (!match[key](val[key])) return false;
+    }
+    return true;
+  }
+}
+
+});
+require.register("component-enumerable/index.js", function(exports, require, module){
+
+/**
+ * Module dependencies.
+ */
+
+var toFunction = require('to-function')
+  , proto = {};
+
+/**
+ * Expose `Enumerable`.
+ */
+
+module.exports = Enumerable;
+
+/**
+ * Mixin to `obj`.
+ *
+ *    var Enumerable = require('enumerable');
+ *    Enumerable(Something.prototype);
+ *
+ * @param {Object} obj
+ * @return {Object} obj
+ */
+
+function mixin(obj){
+  for (var key in proto) obj[key] = proto[key];
+  obj.__iterate__ = obj.__iterate__ || defaultIterator;
+  return obj;
+}
+
+/**
+ * Initialize a new `Enumerable` with the given `obj`.
+ *
+ * @param {Object} obj
+ * @api private
+ */
+
+function Enumerable(obj) {
+  if (!(this instanceof Enumerable)) {
+    if (Array.isArray(obj)) return new Enumerable(obj);
+    return mixin(obj);
+  }
+  this.obj = obj;
+}
+
+/*!
+ * Default iterator utilizing `.length` and subscripts.
+ */
+
+function defaultIterator() {
+  var self = this;
+  return {
+    length: function(){ return self.length },
+    get: function(i){ return self[i] }
+  }
+}
+
+/**
+ * Return a string representation of this enumerable.
+ *
+ *    [Enumerable [1,2,3]]
+ *
+ * @return {String}
+ * @api public
+ */
+
+Enumerable.prototype.inspect =
+Enumerable.prototype.toString = function(){
+  return '[Enumerable ' + JSON.stringify(this.obj) + ']';
+};
+
+/**
+ * Iterate enumerable.
+ *
+ * @return {Object}
+ * @api private
+ */
+
+Enumerable.prototype.__iterate__ = function(){
+  var obj = this.obj;
+  obj.__iterate__ = obj.__iterate__ || defaultIterator;
+  return obj.__iterate__();
+};
+
+/**
+ * Iterate each value and invoke `fn(val, i)`.
+ *
+ *    users.each(function(val, i){
+ *
+ *    })
+ *
+ * @param {Function} fn
+ * @return {Object} self
+ * @api public
+ */
+
+proto.forEach =
+proto.each = function(fn){
+  var vals = this.__iterate__();
+  var len = vals.length();
+  for (var i = 0; i < len; ++i) {
+    fn(vals.get(i), i);
+  }
+  return this;
+};
+
+/**
+ * Map each return value from `fn(val, i)`.
+ *
+ * Passing a callback function:
+ *
+ *    users.map(function(user){
+ *      return user.name.first
+ *    })
+ *
+ * Passing a property string:
+ *
+ *    users.map('name.first')
+ *
+ * @param {Function} fn
+ * @return {Enumerable}
+ * @api public
+ */
+
+proto.map = function(fn){
+  fn = toFunction(fn);
+  var vals = this.__iterate__();
+  var len = vals.length();
+  var arr = [];
+  for (var i = 0; i < len; ++i) {
+    arr.push(fn(vals.get(i), i));
+  }
+  return new Enumerable(arr);
+};
+
+/**
+ * Select all values that return a truthy value of `fn(val, i)`.
+ *
+ *    users.select(function(user){
+ *      return user.age > 20
+ *    })
+ *
+ *  With a property:
+ *
+ *    items.select('complete')
+ *
+ * @param {Function|String} fn
+ * @return {Enumerable}
+ * @api public
+ */
+
+proto.filter =
+proto.select = function(fn){
+  fn = toFunction(fn);
+  var val;
+  var arr = [];
+  var vals = this.__iterate__();
+  var len = vals.length();
+  for (var i = 0; i < len; ++i) {
+    val = vals.get(i);
+    if (fn(val, i)) arr.push(val);
+  }
+  return new Enumerable(arr);
+};
+
+/**
+ * Select all unique values.
+ *
+ *    nums.unique()
+ *
+ * @return {Enumerable}
+ * @api public
+ */
+
+proto.unique = function(){
+  var val;
+  var arr = [];
+  var vals = this.__iterate__();
+  var len = vals.length();
+  for (var i = 0; i < len; ++i) {
+    val = vals.get(i);
+    if (~arr.indexOf(val)) continue;
+    arr.push(val);
+  }
+  return new Enumerable(arr);
+};
+
+/**
+ * Reject all values that return a truthy value of `fn(val, i)`.
+ *
+ * Rejecting using a callback:
+ *
+ *    users.reject(function(user){
+ *      return user.age < 20
+ *    })
+ *
+ * Rejecting with a property:
+ *
+ *    items.reject('complete')
+ *
+ * Rejecting values via `==`:
+ *
+ *    data.reject(null)
+ *    users.reject(tobi)
+ *
+ * @param {Function|String|Mixed} fn
+ * @return {Enumerable}
+ * @api public
+ */
+
+proto.reject = function(fn){
+  var val;
+  var arr = [];
+  var vals = this.__iterate__();
+  var len = vals.length();
+
+  if ('string' == typeof fn) fn = toFunction(fn);
+
+  if (fn) {
+    for (var i = 0; i < len; ++i) {
+      val = vals.get(i);
+      if (!fn(val, i)) arr.push(val);
+    }
+  } else {
+    for (var i = 0; i < len; ++i) {
+      val = vals.get(i);
+      if (val != fn) arr.push(val);
+    }
+  }
+
+  return new Enumerable(arr);
+};
+
+/**
+ * Reject `null` and `undefined`.
+ *
+ *    [1, null, 5, undefined].compact()
+ *    // => [1,5]
+ *
+ * @return {Enumerable}
+ * @api public
+ */
+
+
+proto.compact = function(){
+  return this.reject(null);
+};
+
+/**
+ * Return the first value when `fn(val, i)` is truthy,
+ * otherwise return `undefined`.
+ *
+ *    users.find(function(user){
+ *      return user.role == 'admin'
+ *    })
+ *
+ * With a property string:
+ *
+ *    users.find('age > 20')
+ *
+ * @param {Function|String} fn
+ * @return {Mixed}
+ * @api public
+ */
+
+proto.find = function(fn){
+  fn = toFunction(fn);
+  var val;
+  var vals = this.__iterate__();
+  var len = vals.length();
+  for (var i = 0; i < len; ++i) {
+    val = vals.get(i);
+    if (fn(val, i)) return val;
+  }
+};
+
+/**
+ * Return the last value when `fn(val, i)` is truthy,
+ * otherwise return `undefined`.
+ *
+ *    users.findLast(function(user){
+ *      return user.role == 'admin'
+ *    })
+ *
+ * @param {Function} fn
+ * @return {Mixed}
+ * @api public
+ */
+
+proto.findLast = function(fn){
+  fn = toFunction(fn);
+  var val;
+  var vals = this.__iterate__();
+  var len = vals.length();
+  for (var i = len - 1; i > -1; --i) {
+    val = vals.get(i);
+    if (fn(val, i)) return val;
+  }
+};
+
+/**
+ * Assert that all invocations of `fn(val, i)` are truthy.
+ *
+ * For example ensuring that all pets are ferrets:
+ *
+ *    pets.all(function(pet){
+ *      return pet.species == 'ferret'
+ *    })
+ *
+ *    users.all('admin')
+ *
+ * @param {Function|String} fn
+ * @return {Boolean}
+ * @api public
+ */
+
+proto.all =
+proto.every = function(fn){
+  fn = toFunction(fn);
+  var val;
+  var vals = this.__iterate__();
+  var len = vals.length();
+  for (var i = 0; i < len; ++i) {
+    val = vals.get(i);
+    if (!fn(val, i)) return false;
+  }
+  return true;
+};
+
+/**
+ * Assert that none of the invocations of `fn(val, i)` are truthy.
+ *
+ * For example ensuring that no pets are admins:
+ *
+ *    pets.none(function(p){ return p.admin })
+ *    pets.none('admin')
+ *
+ * @param {Function|String} fn
+ * @return {Boolean}
+ * @api public
+ */
+
+proto.none = function(fn){
+  fn = toFunction(fn);
+  var val;
+  var vals = this.__iterate__();
+  var len = vals.length();
+  for (var i = 0; i < len; ++i) {
+    val = vals.get(i);
+    if (fn(val, i)) return false;
+  }
+  return true;
+};
+
+/**
+ * Assert that at least one invocation of `fn(val, i)` is truthy.
+ *
+ * For example checking to see if any pets are ferrets:
+ *
+ *    pets.any(function(pet){
+ *      return pet.species == 'ferret'
+ *    })
+ *
+ * @param {Function} fn
+ * @return {Boolean}
+ * @api public
+ */
+
+proto.any = function(fn){
+  fn = toFunction(fn);
+  var val;
+  var vals = this.__iterate__();
+  var len = vals.length();
+  for (var i = 0; i < len; ++i) {
+    val = vals.get(i);
+    if (fn(val, i)) return true;
+  }
+  return false;
+};
+
+/**
+ * Count the number of times `fn(val, i)` returns true.
+ *
+ *    var n = pets.count(function(pet){
+ *      return pet.species == 'ferret'
+ *    })
+ *
+ * @param {Function} fn
+ * @return {Number}
+ * @api public
+ */
+
+proto.count = function(fn){
+  var val;
+  var vals = this.__iterate__();
+  var len = vals.length();
+  var n = 0;
+  for (var i = 0; i < len; ++i) {
+    val = vals.get(i);
+    if (fn(val, i)) ++n;
+  }
+  return n;
+};
+
+/**
+ * Determine the indexof `obj` or return `-1`.
+ *
+ * @param {Mixed} obj
+ * @return {Number}
+ * @api public
+ */
+
+proto.indexOf = function(obj){
+  var val;
+  var vals = this.__iterate__();
+  var len = vals.length();
+  for (var i = 0; i < len; ++i) {
+    val = vals.get(i);
+    if (val === obj) return i;
+  }
+  return -1;
+};
+
+/**
+ * Check if `obj` is present in this enumerable.
+ *
+ * @param {Mixed} obj
+ * @return {Boolean}
+ * @api public
+ */
+
+proto.has = function(obj){
+  return !! ~this.indexOf(obj);
+};
+
+/**
+ * Reduce with `fn(accumulator, val, i)` using
+ * optional `init` value defaulting to the first
+ * enumerable value.
+ *
+ * @param {Function} fn
+ * @param {Mixed} [val]
+ * @return {Mixed}
+ * @api public
+ */
+
+proto.reduce = function(fn, init){
+  var val;
+  var i = 0;
+  var vals = this.__iterate__();
+  var len = vals.length();
+
+  val = null == init
+    ? vals.get(i++)
+    : init;
+
+  for (; i < len; ++i) {
+    val = fn(val, vals.get(i), i);
+  }
+
+  return val;
+};
+
+/**
+ * Determine the max value.
+ *
+ * With a callback function:
+ *
+ *    pets.max(function(pet){
+ *      return pet.age
+ *    })
+ *
+ * With property strings:
+ *
+ *    pets.max('age')
+ *
+ * With immediate values:
+ *
+ *    nums.max()
+ *
+ * @param {Function|String} fn
+ * @return {Number}
+ * @api public
+ */
+
+proto.max = function(fn){
+  var val;
+  var n = 0;
+  var max = -Infinity;
+  var vals = this.__iterate__();
+  var len = vals.length();
+
+  if (fn) {
+    fn = toFunction(fn);
+    for (var i = 0; i < len; ++i) {
+      n = fn(vals.get(i), i);
+      max = n > max ? n : max;
+    }
+  } else {
+    for (var i = 0; i < len; ++i) {
+      n = vals.get(i);
+      max = n > max ? n : max;
+    }
+  }
+
+  return max;
+};
+
+/**
+ * Determine the min value.
+ *
+ * With a callback function:
+ *
+ *    pets.min(function(pet){
+ *      return pet.age
+ *    })
+ *
+ * With property strings:
+ *
+ *    pets.min('age')
+ *
+ * With immediate values:
+ *
+ *    nums.min()
+ *
+ * @param {Function|String} fn
+ * @return {Number}
+ * @api public
+ */
+
+proto.min = function(fn){
+  var val;
+  var n = 0;
+  var min = Infinity;
+  var vals = this.__iterate__();
+  var len = vals.length();
+
+  if (fn) {
+    fn = toFunction(fn);
+    for (var i = 0; i < len; ++i) {
+      n = fn(vals.get(i), i);
+      min = n < min ? n : min;
+    }
+  } else {
+    for (var i = 0; i < len; ++i) {
+      n = vals.get(i);
+      min = n < min ? n : min;
+    }
+  }
+
+  return min;
+};
+
+/**
+ * Determine the sum.
+ *
+ * With a callback function:
+ *
+ *    pets.sum(function(pet){
+ *      return pet.age
+ *    })
+ *
+ * With property strings:
+ *
+ *    pets.sum('age')
+ *
+ * With immediate values:
+ *
+ *    nums.sum()
+ *
+ * @param {Function|String} fn
+ * @return {Number}
+ * @api public
+ */
+
+proto.sum = function(fn){
+  var ret;
+  var n = 0;
+  var vals = this.__iterate__();
+  var len = vals.length();
+
+  if (fn) {
+    fn = toFunction(fn);
+    for (var i = 0; i < len; ++i) {
+      n += fn(vals.get(i), i);
+    }
+  } else {
+    for (var i = 0; i < len; ++i) {
+      n += vals.get(i);
+    }
+  }
+
+  return n;
+};
+
+/**
+ * Determine the average value.
+ *
+ * With a callback function:
+ *
+ *    pets.avg(function(pet){
+ *      return pet.age
+ *    })
+ *
+ * With property strings:
+ *
+ *    pets.avg('age')
+ *
+ * With immediate values:
+ *
+ *    nums.avg()
+ *
+ * @param {Function|String} fn
+ * @return {Number}
+ * @api public
+ */
+
+proto.avg =
+proto.mean = function(fn){
+  var ret;
+  var n = 0;
+  var vals = this.__iterate__();
+  var len = vals.length();
+
+  if (fn) {
+    fn = toFunction(fn);
+    for (var i = 0; i < len; ++i) {
+      n += fn(vals.get(i), i);
+    }
+  } else {
+    for (var i = 0; i < len; ++i) {
+      n += vals.get(i);
+    }
+  }
+
+  return n / len;
+};
+
+/**
+ * Return the first value, or first `n` values.
+ *
+ * @param {Number|Function} [n]
+ * @return {Array|Mixed}
+ * @api public
+ */
+
+proto.first = function(n){
+  if ('function' == typeof n) return this.find(n);
+  var vals = this.__iterate__();
+
+  if (n) {
+    var len = Math.min(n, vals.length());
+    var arr = new Array(len);
+    for (var i = 0; i < len; ++i) {
+      arr[i] = vals.get(i);
+    }
+    return arr;
+  }
+
+  return vals.get(0);
+};
+
+/**
+ * Return the last value, or last `n` values.
+ *
+ * @param {Number|Function} [n]
+ * @return {Array|Mixed}
+ * @api public
+ */
+
+proto.last = function(n){
+  if ('function' == typeof n) return this.findLast(n);
+  var vals = this.__iterate__();
+  var len = vals.length();
+
+  if (n) {
+    var i = Math.max(0, len - n);
+    var arr = [];
+    for (; i < len; ++i) {
+      arr.push(vals.get(i));
+    }
+    return arr;
+  }
+
+  return vals.get(len - 1);
+};
+
+/**
+ * Return values in groups of `n`.
+ *
+ * @param {Number} n
+ * @return {Enumerable}
+ * @api public
+ */
+
+proto.inGroupsOf = function(n){
+  var arr = [];
+  var group = [];
+  var vals = this.__iterate__();
+  var len = vals.length();
+
+  for (var i = 0; i < len; ++i) {
+    group.push(vals.get(i));
+    if ((i + 1) % n == 0) {
+      arr.push(group);
+      group = [];
+    }
+  }
+
+  if (group.length) arr.push(group);
+
+  return new Enumerable(arr);
+};
+
+/**
+ * Return the value at the given index.
+ *
+ * @param {Number} i
+ * @return {Mixed}
+ * @api public
+ */
+
+proto.at = function(i){
+  return this.__iterate__().get(i);
+};
+
+/**
+ * Return a regular `Array`.
+ *
+ * @return {Array}
+ * @api public
+ */
+
+proto.toJSON =
+proto.array = function(){
+  var arr = [];
+  var vals = this.__iterate__();
+  var len = vals.length();
+  for (var i = 0; i < len; ++i) {
+    arr.push(vals.get(i));
+  }
+  return arr;
+};
+
+/**
+ * Return the enumerable value.
+ *
+ * @return {Mixed}
+ * @api public
+ */
+
+proto.value = function(){
+  return this.obj;
+};
+
+/**
+ * Mixin enumerable.
+ */
+
+mixin(Enumerable.prototype);
+
+});
+require.register("component-collection/index.js", function(exports, require, module){
+
+/**
+ * Module dependencies.
+ */
+
+var Enumerable = require('enumerable');
+
+/**
+ * Expose `Collection`.
+ */
+
+module.exports = Collection;
+
+/**
+ * Initialize a new collection with the given `models`.
+ *
+ * @param {Array} models
+ * @api public
+ */
+
+function Collection(models) {
+  this.models = models || [];
+}
+
+/**
+ * Mixin enumerable.
+ */
+
+Enumerable(Collection.prototype);
+
+/**
+ * Iterator implementation.
+ */
+
+Collection.prototype.__iterate__ = function(){
+  var self = this;
+  return {
+    length: function(){ return self.length() },
+    get: function(i){ return self.models[i] }
+  }
+};
+
+/**
+ * Return the collection length.
+ *
+ * @return {Number}
+ * @api public
+ */
+
+Collection.prototype.length = function(){
+  return this.models.length;
+};
+
+/**
+ * Add `model` to the collection and return the index.
+ *
+ * @param {Object} model
+ * @return {Number}
+ * @api public
+ */
+
+Collection.prototype.push = function(model){
+  return this.models.push(model);
+};
+
+});
+require.register("component-model/lib/index.js", function(exports, require, module){
+
+/**
+ * Module dependencies.
+ */
+
+var proto = require('./proto')
+  , statics = require('./static')
+  , Emitter = require('emitter');
+
+/**
+ * Expose `createModel`.
+ */
+
+module.exports = createModel;
+
+/**
+ * Create a new model constructor with the given `name`.
+ *
+ * @param {String} name
+ * @return {Function}
+ * @api public
+ */
+
+function createModel(name) {
+  if ('string' != typeof name) throw new TypeError('model name required');
+
+  /**
+   * Initialize a new model with the given `attrs`.
+   *
+   * @param {Object} attrs
+   * @api public
+   */
+
+  function model(attrs) {
+    if (!(this instanceof model)) return new model(attrs);
+    attrs = attrs || {};
+    this._callbacks = {};
+    this.attrs = attrs;
+    this.dirty = attrs;
+    this.model.emit('construct', this, attrs);
+  }
+
+  // mixin emitter
+
+  Emitter(model);
+
+  // statics
+
+  model.modelName = name;
+  model.base = '/' + name.toLowerCase();
+  model.attrs = {};
+  model.validators = [];
+  for (var key in statics) model[key] = statics[key];
+
+  // prototype
+
+  model.prototype = {};
+  model.prototype.model = model;
+  for (var key in proto) model.prototype[key] = proto[key];
+
+  return model;
+}
+
+
+});
+require.register("component-model/lib/static.js", function(exports, require, module){
+
+/**
+ * Module dependencies.
+ */
+
+var request = require('superagent')
+  , Collection = require('collection')
+  , noop = function(){};
+
+/**
+ * Construct a url to the given `path`.
+ *
+ * Example:
+ *
+ *    User.url('add')
+ *    // => "/users/add"
+ *
+ * @param {String} path
+ * @return {String}
+ * @api public
+ */
+
+exports.url = function(path){
+  var url = this.base;
+  if (0 == arguments.length) return url;
+  return url + '/' + path;
+};
+
+/**
+ * Add validation `fn()`.
+ *
+ * @param {Function} fn
+ * @return {Function} self
+ * @api public
+ */
+
+exports.validate = function(fn){
+  this.validators.push(fn);
+  return this;
+};
+
+/**
+ * Use the given plugin `fn()`.
+ *
+ * @param {Function} fn
+ * @return {Function} self
+ * @api public
+ */
+
+exports.use = function(fn){
+  fn(this);
+  return this;
+};
+
+/**
+ * Define attr with the given `name` and `options`.
+ *
+ * @param {String} name
+ * @param {Object} options
+ * @return {Function} self
+ * @api public
+ */
+
+exports.attr = function(name, options){
+  this.attrs[name] = options || {};
+
+  // implied pk
+  if ('_id' == name || 'id' == name) {
+    this.attrs[name].primaryKey = true;
+    this.primaryKey = name;
+  }
+
+  // getter / setter method
+  this.prototype[name] = function(val){
+    if (0 == arguments.length) return this.attrs[name];
+    var prev = this.attrs[name];
+    this.dirty[name] = val;
+    this.attrs[name] = val;
+    this.model.emit('change', this, name, val, prev);
+    this.model.emit('change ' + name, this, val, prev);
+    this.emit('change', name, val, prev);
+    this.emit('change ' + name, val, prev);
+    return this;
+  };
+
+  return this;
+};
+
+/**
+ * Remove all and invoke `fn(err)`.
+ *
+ * @param {Function} [fn]
+ * @api public
+ */
+
+exports.removeAll = function(fn){
+  fn = fn || noop;
+  var self = this;
+  var url = this.url('all');
+  request.del(url, function(res){
+    if (res.error) return fn(error(res));
+    fn();
+  });
+};
+
+/**
+ * Get all and invoke `fn(err, array)`.
+ *
+ * @param {Function} fn
+ * @api public
+ */
+
+exports.all = function(fn){
+  var self = this;
+  var url = this.url('all');
+  request.get(url, function(res){
+    if (res.error) return fn(error(res));
+    var col = new Collection;
+    for (var i = 0, len = res.body.length; i < len; ++i) {
+      col.push(new self(res.body[i]));
+    }
+    fn(null, col);
+  });
+};
+
+/**
+ * Get `id` and invoke `fn(err, model)`.
+ *
+ * @param {Mixed} id
+ * @param {Function} fn
+ * @api public
+ */
+
+exports.get = function(id, fn){
+  var self = this;
+  var url = this.url(id);
+  request.get(url, function(res){
+    if (res.error) return fn(error(res));
+    var model = new self(res.body);
+    fn(null, model);
+  });
+};
+
+/**
+ * Response error helper.
+ *
+ * @param {Response} er
+ * @return {Error}
+ * @api private
+ */
+
+function error(res) {
+  return new Error('got ' + res.status + ' response');
+}
+
+});
+require.register("component-model/lib/proto.js", function(exports, require, module){
+
+/**
+ * Module dependencies.
+ */
+
+var Emitter = require('emitter')
+  , request = require('superagent')
+  , each = require('each')
+  , noop = function(){};
+
+/**
+ * Mixin emitter.
+ */
+
+Emitter(exports);
+
+/**
+ * Register an error `msg` on `attr`.
+ *
+ * @param {String} attr
+ * @param {String} msg
+ * @return {Object} self
+ * @api public
+ */
+
+exports.error = function(attr, msg){
+  this.errors.push({
+    attr: attr,
+    message: msg
+  });
+  return this;
+};
+
+/**
+ * Check if this model is new.
+ *
+ * @return {Boolean}
+ * @api public
+ */
+
+exports.isNew = function(){
+  var key = this.model.primaryKey;
+  return ! this.has(key);
+};
+
+/**
+ * Get / set the primary key.
+ *
+ * @param {Mixed} val
+ * @return {Mixed}
+ * @api public
+ */
+
+exports.primary = function(val){
+  var key = this.model.primaryKey;
+  if (0 == arguments.length) return this[key]();
+  return this[key](val);
+};
+
+/**
+ * Validate the model and return a boolean.
+ *
+ * Example:
+ *
+ *    user.isValid()
+ *    // => false
+ *
+ *    user.errors
+ *    // => [{ attr: ..., message: ... }]
+ *
+ * @return {Boolean}
+ * @api public
+ */
+
+exports.isValid = function(){
+  this.validate();
+  return 0 == this.errors.length;
+};
+
+/**
+ * Return `false` or an object
+ * containing the "dirty" attributes.
+ *
+ * Optionally check for a specific `attr`.
+ *
+ * @param {String} [attr]
+ * @return {Object|Boolean}
+ * @api public
+ */
+
+exports.changed = function(attr){
+  var dirty = this.dirty;
+  if (Object.keys(dirty).length) {
+    if (attr) return !! dirty[attr];
+    return dirty;
+  }
+  return false;
+};
+
+/**
+ * Perform validations.
+ *
+ * @api private
+ */
+
+exports.validate = function(){
+  var self = this;
+  var fns = this.model.validators;
+  this.errors = [];
+  each(fns, function(fn){ fn(self) });
+};
+
+/**
+ * Destroy the model and mark it as `.destroyed`
+ * and invoke `fn(err)`.
+ *
+ * Events:
+ *
+ *  - `destroying` before deletion
+ *  - `destroy` on deletion
+ *
+ * @param {Function} [fn]
+ * @api public
+ */
+
+exports.destroy = function(fn){
+  fn = fn || noop;
+  if (this.isNew()) return fn(new Error('not saved'));
+  var self = this;
+  var url = this.url();
+  this.model.emit('destroying', this);
+  this.emit('destroying');
+  request.del(url, function(res){
+    if (res.error) return fn(error(res));
+    self.destroyed = true;
+    self.model.emit('destroy', self);
+    self.emit('destroy');
+    fn();
+  });
+};
+
+/**
+ * Save and invoke `fn(err)`.
+ *
+ * Events:
+ *
+ *  - `saving` pre-update or save, after validation
+ *  - `save` on updates and saves
+ *
+ * @param {Function} [fn]
+ * @api public
+ */
+
+exports.save = function(fn){
+  if (!this.isNew()) return this.update(fn);
+  var self = this;
+  var url = this.model.url();
+  fn = fn || noop;
+  if (!this.isValid()) return fn(new Error('validation failed'));
+  this.model.emit('saving', this);
+  this.emit('saving');
+  request.post(url, self, function(res){
+    if (res.error) return fn(error(res));
+    if (res.body) self.primary(res.body.id);
+    self.dirty = {};
+    self.model.emit('save', self);
+    self.emit('save');
+    fn();
+  });
+};
+
+/**
+ * Update and invoke `fn(err)`.
+ *
+ * @param {Function} [fn]
+ * @api private
+ */
+
+exports.update = function(fn){
+  var self = this;
+  var url = this.url();
+  fn = fn || noop;
+  if (!this.isValid()) return fn(new Error('validation failed'));
+  this.model.emit('saving', this);
+  this.emit('saving');
+  request.put(url, self, function(res){
+    if (res.error) return fn(error(res));
+    self.dirty = {};
+    self.model.emit('save', self);
+    self.emit('save');
+    fn();
+  });
+};
+
+/**
+ * Return a url for `path` relative to this model.
+ *
+ * Example:
+ *
+ *    var user = new User({ id: 5 });
+ *    user.url('edit');
+ *    // => "/users/5/edit"
+ *
+ * @param {String} path
+ * @return {String}
+ * @api public
+ */
+
+exports.url = function(path){
+  var model = this.model;
+  var url = model.base;
+  var id = this.primary();
+  if (0 == arguments.length) return url + '/' + id;
+  return url + '/' + id + '/' + path;
+};
+
+/**
+ * Set multiple `attrs`.
+ *
+ * @param {Object} attrs
+ * @return {Object} self
+ * @api public
+ */
+
+exports.set = function(attrs){
+  for (var key in attrs) {
+    this[key](attrs[key]);
+  }
+  return this;
+};
+
+/**
+ * Get `attr` value.
+ *
+ * @param {String} attr
+ * @return {Mixed}
+ * @api public
+ */
+
+exports.get = function(attr){
+  return this.attrs[attr];
+};
+
+/**
+ * Check if `attr` is present (not `null` or `undefined`).
+ *
+ * @param {String} attr
+ * @return {Boolean}
+ * @api public
+ */
+
+exports.has = function(attr){
+  return null != this.attrs[attr];
+};
+
+/**
+ * Return the JSON representation of the model.
+ *
+ * @return {Object}
+ * @api public
+ */
+
+exports.toJSON = function(){
+  return this.attrs;
+};
+
+/**
+ * Response error helper.
+ *
+ * @param {Response} er
+ * @return {Error}
+ * @api private
+ */
+
+function error(res) {
+  return new Error('got ' + res.status + ' response');
+}
+});
 require.register("rest-endpoint/index.js", function(exports, require, module){
 // Generated by CoffeeScript 1.6.3
 (function() {
-  var Endpoint, request;
+  var Endpoint, model, request,
+    __hasProp = {}.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
   request = require('superagent');
 
-  module.exports = Endpoint = (function() {
+  model = require('model');
+
+  module.exports = Endpoint = (function(_super) {
+    __extends(Endpoint, _super);
+
     function Endpoint(url, version, key) {
       this.version = version || 'v0';
       this.key = key || '';
       this.url = url || 'http://localhost:3000/api';
-      console.log(this.url);
     }
 
     Endpoint.prototype.get = function(callback) {
@@ -1822,7 +3373,6 @@ require.register("rest-endpoint/index.js", function(exports, require, module){
         if (err) {
           return console.log("Error: " + err);
         } else {
-          console.log(res.body);
           return callback(res.body);
         }
       });
@@ -1830,7 +3380,7 @@ require.register("rest-endpoint/index.js", function(exports, require, module){
 
     return Endpoint;
 
-  })();
+  })(model);
 
 }).call(this);
 
@@ -1856,7 +3406,10 @@ require.register("rest-api/index.js", function(exports, require, module){
       version = ctx.params.version;
       key = ctx.params[0];
       endpoint = new Endpoint(this.url, version, key);
-      return endpoint.get(function(data) {});
+      console.log(endpoint);
+      return endpoint.get(function(data) {
+        return console.log(data);
+      });
     };
 
     return Api;
@@ -1920,6 +3473,31 @@ require.alias("component-indexof/index.js", "component-emitter/deps/indexof/inde
 require.alias("RedVentures-reduce/index.js", "visionmedia-superagent/deps/reduce/index.js");
 
 require.alias("visionmedia-superagent/lib/client.js", "visionmedia-superagent/index.js");
+
+require.alias("component-model/lib/index.js", "rest-endpoint/deps/model/lib/index.js");
+require.alias("component-model/lib/static.js", "rest-endpoint/deps/model/lib/static.js");
+require.alias("component-model/lib/proto.js", "rest-endpoint/deps/model/lib/proto.js");
+require.alias("component-model/lib/index.js", "rest-endpoint/deps/model/index.js");
+require.alias("component-each/index.js", "component-model/deps/each/index.js");
+require.alias("component-type/index.js", "component-each/deps/type/index.js");
+
+require.alias("component-emitter/index.js", "component-model/deps/emitter/index.js");
+require.alias("component-indexof/index.js", "component-emitter/deps/indexof/index.js");
+
+require.alias("component-collection/index.js", "component-model/deps/collection/index.js");
+require.alias("component-enumerable/index.js", "component-collection/deps/enumerable/index.js");
+require.alias("component-to-function/index.js", "component-enumerable/deps/to-function/index.js");
+
+require.alias("visionmedia-superagent/lib/client.js", "component-model/deps/superagent/lib/client.js");
+require.alias("visionmedia-superagent/lib/client.js", "component-model/deps/superagent/index.js");
+require.alias("component-emitter/index.js", "visionmedia-superagent/deps/emitter/index.js");
+require.alias("component-indexof/index.js", "component-emitter/deps/indexof/index.js");
+
+require.alias("RedVentures-reduce/index.js", "visionmedia-superagent/deps/reduce/index.js");
+
+require.alias("visionmedia-superagent/lib/client.js", "visionmedia-superagent/index.js");
+
+require.alias("component-model/lib/index.js", "component-model/index.js");
 
 require.alias("boot/boot.js", "boot/index.js");
 
