@@ -1,10 +1,10 @@
 ### boot - This is the core client application ###
 
-page = require 'page'
-Api = require 'rest-api'
+page = require 'page'     # Simple page router - https://github.com/visionmedia/page.js
+Api = require 'rest-api'  # 
 
+### Controllers ###
 api = new Api
-console.log api
 
 ### Routes ###
 
@@ -24,5 +24,4 @@ page '/logout', (ctx) ->
 page '*', (ctx) ->
   console.log '404'
 
-page()
-
+page()  # This initializes the page and makes the above routes active

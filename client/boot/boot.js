@@ -9,9 +9,10 @@
 
   Api = require('rest-api');
 
-  api = new Api;
+  /* Controllers*/
 
-  console.log(api);
+
+  api = new Api;
 
   /* Routes*/
 
