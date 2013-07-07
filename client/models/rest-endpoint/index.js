@@ -14,7 +14,7 @@
 
   model = require('model');
 
-  module.exports = Endpoint = model('Endpoint').attr('version').attr('key').attr('url');
+  module.exports = Endpoint = model('Endpoint').attr('version').attr('key').attr('value').attr('url');
 
   Endpoint.prototype.get = function(callback) {
     var _this = this;
