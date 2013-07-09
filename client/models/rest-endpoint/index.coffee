@@ -26,13 +26,8 @@ module.exports = Endpoint = model('Endpoint')
         # Set key
         @set { key: @parseUrl @attrs.keyUrl }
 
-        # Set values
-        if typeof res.body is String
-          # Firebase returns a string if there's only one piece of data in a response
-          @set { value: res.body }
-        else
-          # Return the full object
-          @set { value: res.text.slice 1, res.text.length-1 } # Remove quotes from start/end of value
+        # Set value
+        @set { value: res.body }
 
         callback @value
 
