@@ -24,17 +24,17 @@ module.exports = Endpoint = model('Endpoint')
         console.log "Error: " + err
       else
         # Set key
-        @set {key: @parseUrl @attrs.keyUrl }
+        @set { key: @parseUrl @attrs.keyUrl }
 
         # Set values
         if typeof res.body is String
           # Firebase returns a string if there's only one piece of data in a response
-          @value = res.body  
+          @set { value: res.body }
         else
           # Return the full object
-          @value = res.text
+          @set { value: res.text.slice 1, res.text.length-1 } # Remove quotes from start/end of value
 
-        callback res.body
+        callback @value
 
   Endpoint.prototype.toString = () ->
     output = ""

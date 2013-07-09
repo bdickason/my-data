@@ -4858,11 +4858,15 @@ require.register("rest-endpoint/index.js", function(exports, require, module){
           key: _this.parseUrl(_this.attrs.keyUrl)
         });
         if (typeof res.body === String) {
-          _this.value = res.body;
+          _this.set({
+            value: res.body
+          });
         } else {
-          _this.value = res.text;
+          _this.set({
+            value: res.text.slice(1, res.text.length - 1)
+          });
         }
-        return callback(res.body);
+        return callback(_this.value);
       }
     });
   };
@@ -4926,8 +4930,9 @@ require.register("rest-api/index.js", function(exports, require, module){
       });
       return endpoint.get(function(data) {
         var values;
-        console.log(data);
         values = document.querySelector('.values');
+        console.log(values);
+        console.log(endpoint);
         return reactive(values, endpoint);
       });
     };

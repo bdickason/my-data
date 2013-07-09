@@ -26,11 +26,15 @@
           key: _this.parseUrl(_this.attrs.keyUrl)
         });
         if (typeof res.body === String) {
-          _this.value = res.body;
+          _this.set({
+            value: res.body
+          });
         } else {
-          _this.value = res.text;
+          _this.set({
+            value: res.text.slice(1, res.text.length - 1)
+          });
         }
-        return callback(res.body);
+        return callback(_this.value);
       }
     });
   };

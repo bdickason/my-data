@@ -35,8 +35,9 @@
       });
       return endpoint.get(function(data) {
         var values;
-        console.log(data);
         values = document.querySelector('.values');
+        console.log(values);
+        console.log(endpoint);
         return reactive(values, endpoint);
       });
     };

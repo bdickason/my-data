@@ -26,8 +26,10 @@ module.exports = class Api
       keyUrl: keyUrl
 
     endpoint.get (data) ->
-      console.log data
+      
       # Render view
       values = document.querySelector '.values' 
-
+      
+      console.log values
+      console.log endpoint
       reactive values, endpoint   # Template will be bound and will auto-update with new data
