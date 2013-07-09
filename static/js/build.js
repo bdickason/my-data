@@ -4846,16 +4846,19 @@ require.register("rest-endpoint/index.js", function(exports, require, module){
 
   model = require('model');
 
-  module.exports = Endpoint = model('Endpoint').attr('url').attr('version').attr('keyUrl').attr('key').attr('value');
+  module.exports = Endpoint = model('Endpoint').attr('url').attr('version').attr('keyUrl').attr('key').attr('value').attr('parameters');
 
   Endpoint.prototype.get = function(callback) {
     var _this = this;
     return request.get("" + this.attrs.url + "/" + this.attrs.version + "/" + this.attrs.keyUrl, function(err, res) {
+      var key;
       if (err) {
         return console.log("Error: " + err);
       } else {
+        _this.parameters = _this.parseUrl(_this.attrs.keyUrl);
+        key = _this.parameters[_this.parameters.length - 1];
         _this.set({
-          key: _this.parseUrl(_this.attrs.keyUrl)
+          key: key
         });
         _this.set({
           value: res.body
@@ -4880,7 +4883,7 @@ require.register("rest-endpoint/index.js", function(exports, require, module){
       keyUrl = keyUrl.slice(0, keyUrl.length - 1);
     }
     parameters = keyUrl.split('/');
-    return parameters[parameters.length - 1];
+    return parameters;
   };
 
 }).call(this);

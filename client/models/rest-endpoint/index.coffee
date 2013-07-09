@@ -12,9 +12,10 @@ model = require 'model'
 module.exports = Endpoint = model('Endpoint')
   .attr('url')      # Url to the data store (should always be passed in by the controller)
   .attr('version')  # Version of the API to call (e.g. 'v0')
-  .attr('keyUrl')      # Key to access this endpoint (e.g. '/email')
+  .attr('keyUrl')       # Key to access this endpoint (e.g. '/email')
   .attr('key')
-  .attr('value')    # Value associated with key
+  .attr('value')      # Value associated with key
+  .attr('parameters') # Parameters that make up the URL
   
 
   # Call the data store (in this case our API) for the model info
@@ -23,14 +24,16 @@ module.exports = Endpoint = model('Endpoint')
       if err
         console.log "Error: " + err
       else
+        @parameters = @parseUrl @attrs.keyUrl
         # Set key
-        @set { key: @parseUrl @attrs.keyUrl }
+        key = @parameters[@parameters.length-1] # Get last parameter
+        @set { key: key }
 
-        # Set value
+        # Set Value
         @set { value: res.body }
 
         callback @value
-
+        
   Endpoint.prototype.toString = () ->
     output = ""
     output += "Key: " + @attrs.key + "\n"
@@ -39,6 +42,8 @@ module.exports = Endpoint = model('Endpoint')
     return output
 
   Endpoint.prototype.parseUrl = (keyUrl) ->
+    # Takes URL string and returns list of parameters (array)
+
     if keyUrl[keyUrl.length-1] is '/'
       # If the user appends a '/' to their url, remove it
       keyUrl = keyUrl.slice 0, keyUrl.length-1
@@ -46,4 +51,4 @@ module.exports = Endpoint = model('Endpoint')
     # Split the parameters - we only need the last one      
     parameters = keyUrl.split '/'
 
-    return parameters[parameters.length-1]
+    return parameters
