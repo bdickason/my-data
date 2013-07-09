@@ -24,29 +24,20 @@
     }
 
     Api.prototype.get = function(ctx) {
-      var endpoint, key, version;
+      var endpoint, keyUrl, version;
       console.log(ctx);
       version = ctx.params.version;
-      key = ctx.params[0];
+      keyUrl = ctx.params[0];
       endpoint = new Endpoint({
         url: this.url,
         version: version,
-        key: key
+        keyUrl: keyUrl
       });
       return endpoint.get(function(data) {
-        var child, value, values, _results;
+        var values;
         console.log(data);
         values = document.querySelector('.values');
-        reactive(values, endpoint);
-        _results = [];
-        for (key in data) {
-          value = data[key];
-          console.log("Key: " + key);
-          console.log("Value: " + value);
-          child = "<tr id='" + key + "'><td class='key'>" + key + "</td><td class='value'>" + value + "</td><td class='actions'>a1</td></tr>";
-          _results.push(console.log(child));
-        }
-        return _results;
+        return reactive(values, endpoint);
       });
     };
 

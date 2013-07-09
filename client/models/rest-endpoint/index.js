@@ -14,20 +14,43 @@
 
   model = require('model');
 
-  module.exports = Endpoint = model('Endpoint').attr('version').attr('key').attr('value').attr('url');
+  module.exports = Endpoint = model('Endpoint').attr('url').attr('version').attr('keyUrl').attr('key').attr('value');
 
   Endpoint.prototype.get = function(callback) {
     var _this = this;
-    console.log("Key: " + this.attrs.key);
-    console.log("Version: " + this.attrs.version);
-    console.log("Url: " + this.attrs.url);
-    return request.get("" + this.attrs.url + "/" + this.attrs.version + "/" + this.attrs.key, function(err, res) {
+    return request.get("" + this.attrs.url + "/" + this.attrs.version + "/" + this.attrs.keyUrl, function(err, res) {
       if (err) {
         return console.log("Error: " + err);
       } else {
+        _this.set({
+          key: _this.parseUrl(_this.attrs.keyUrl)
+        });
+        if (typeof res.body === String) {
+          _this.value = res.body;
+        } else {
+          _this.value = res.text;
+        }
         return callback(res.body);
       }
     });
+  };
+
+  Endpoint.prototype.toString = function() {
+    var output;
+    output = "";
+    output += "Key: " + this.attrs.key + "\n";
+    output += "Version: " + this.attrs.version + "\n";
+    output += "Url: " + this.attrs.url + "\n";
+    return output;
+  };
+
+  Endpoint.prototype.parseUrl = function(keyUrl) {
+    var parameters;
+    if (keyUrl[keyUrl.length - 1] === '/') {
+      keyUrl = keyUrl.slice(0, keyUrl.length - 1);
+    }
+    parameters = keyUrl.split('/');
+    return parameters[parameters.length - 1];
   };
 
 }).call(this);

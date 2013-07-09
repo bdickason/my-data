@@ -4846,20 +4846,43 @@ require.register("rest-endpoint/index.js", function(exports, require, module){
 
   model = require('model');
 
-  module.exports = Endpoint = model('Endpoint').attr('version').attr('key').attr('url');
+  module.exports = Endpoint = model('Endpoint').attr('url').attr('version').attr('keyUrl').attr('key').attr('value');
 
   Endpoint.prototype.get = function(callback) {
     var _this = this;
-    console.log("Key: " + this.attrs.key);
-    console.log("Version: " + this.attrs.version);
-    console.log("Url: " + this.attrs.url);
-    return request.get("" + this.attrs.url + "/" + this.attrs.version + "/" + this.attrs.key, function(err, res) {
+    return request.get("" + this.attrs.url + "/" + this.attrs.version + "/" + this.attrs.keyUrl, function(err, res) {
       if (err) {
         return console.log("Error: " + err);
       } else {
+        _this.set({
+          key: _this.parseUrl(_this.attrs.keyUrl)
+        });
+        if (typeof res.body === String) {
+          _this.value = res.body;
+        } else {
+          _this.value = res.text;
+        }
         return callback(res.body);
       }
     });
+  };
+
+  Endpoint.prototype.toString = function() {
+    var output;
+    output = "";
+    output += "Key: " + this.attrs.key + "\n";
+    output += "Version: " + this.attrs.version + "\n";
+    output += "Url: " + this.attrs.url + "\n";
+    return output;
+  };
+
+  Endpoint.prototype.parseUrl = function(keyUrl) {
+    var parameters;
+    if (keyUrl[keyUrl.length - 1] === '/') {
+      keyUrl = keyUrl.slice(0, keyUrl.length - 1);
+    }
+    parameters = keyUrl.split('/');
+    return parameters[parameters.length - 1];
   };
 
 }).call(this);
@@ -4892,29 +4915,20 @@ require.register("rest-api/index.js", function(exports, require, module){
     }
 
     Api.prototype.get = function(ctx) {
-      var endpoint, key, version;
+      var endpoint, keyUrl, version;
       console.log(ctx);
       version = ctx.params.version;
-      key = ctx.params[0];
+      keyUrl = ctx.params[0];
       endpoint = new Endpoint({
         url: this.url,
         version: version,
-        key: key
+        keyUrl: keyUrl
       });
       return endpoint.get(function(data) {
-        var child, value, values, _results;
+        var values;
         console.log(data);
         values = document.querySelector('.values');
-        reactive(values, endpoint);
-        _results = [];
-        for (key in data) {
-          value = data[key];
-          console.log("Key: " + key);
-          console.log("Value: " + value);
-          child = "<tr id='" + key + "'><td class='key'>" + key + "</td><td class='value'>" + value + "</td><td class='actions'>a1</td></tr>";
-          _results.push(console.log(child));
-        }
-        return _results;
+        return reactive(values, endpoint);
       });
     };
 

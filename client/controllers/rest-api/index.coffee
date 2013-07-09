@@ -19,23 +19,15 @@ module.exports = class Api
     # ctx - Expects a context from the router (page.js) - https://github.com/visionmedia/page.js#context
     console.log ctx 
     version = ctx.params.version
-    key = ctx.params[0]
+    keyUrl = ctx.params[0]
     endpoint = new Endpoint
       url: @url, 
       version: version, 
-      key: key
+      keyUrl: keyUrl
 
     endpoint.get (data) ->
       console.log data
       # Render view
       values = document.querySelector '.values' 
 
-      reactive values, endpoint
-
-      for key, value of data
-        # Construct table row for entity
-        console.log "Key: " + key
-        console.log "Value: " + value
-        child = "<tr id='#{key}'><td class='key'>#{key}</td><td class='value'>#{value}</td><td class='actions'>a1</td></tr>"
-        console.log child
-        # values.appendChild child
+      reactive values, endpoint   # Template will be bound and will auto-update with new data
