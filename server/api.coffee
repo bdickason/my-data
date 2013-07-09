@@ -7,7 +7,7 @@ exports.Api = class Api
 
   get: (req, res) =>
     # GET a given key
-    # e.g. curl http://localhost:3000/v0/email/personal
+    # e.g. curl http://localhost:3000/api/v0/email/personal
     key = req.params[0]
     console.log req.params
 
@@ -21,10 +21,10 @@ exports.Api = class Api
 
   set: (req, res) =>
     # POST a value to a given key
-    # e.g. curl -X POST -H "Content-Type: application/json" -d '{"personal": "dickason@gmail.com", "work": "brad1@shapeways.com"}' http://localhost:3000/v0/email
+    # e.g. curl -X POST -H "Content-Type: application/json" -d '{"personal": "dickason@gmail.com", "work": "brad1@shapeways.com"}' http://localhost:3000/api/v0/email
 
     # PUT Update an existing key - we treat this the same as post: 'set'
-    # e.g. curl -X PUT -H "Content-Type: application/json" -d '{"personal": "dickason@gmail.com", "work": "brad1@shapeways.com"}' http://localhost:3000/v0/email
+    # e.g. curl -X PUT -H "Content-Type: application/json" -d '{"personal": "dickason@gmail.com", "work": "brad1@shapeways.com"}' http://localhost:3000/api/v0/email
 
     key = req.params[0]
     value = req.body
@@ -40,7 +40,7 @@ exports.Api = class Api
 
   delete: (req, res) =>
     # DELETE a given key and its value.
-    # e.g. curl -X DELETE http://localhost:3000/v0/email/work
+    # e.g. curl -X DELETE http://localhost:3000/api/v0/email/work
     console.log req.params
     key = req.params[0]
 
