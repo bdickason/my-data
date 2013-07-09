@@ -7,10 +7,12 @@
 
 
 (function() {
-  var Api, Endpoint, reactive,
+  var Api, Endpoint, EndpointView, reactive,
     __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
   Endpoint = require('rest-endpoint');
+
+  EndpointView = require('endpoint-view');
 
   reactive = require('reactive');
 

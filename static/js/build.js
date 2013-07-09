@@ -4889,6 +4889,283 @@ require.register("rest-endpoint/index.js", function(exports, require, module){
 }).call(this);
 
 });
+require.register("component-matches-selector/index.js", function(exports, require, module){
+/**
+ * Module dependencies.
+ */
+
+var query = require('query');
+
+/**
+ * Element prototype.
+ */
+
+var proto = Element.prototype;
+
+/**
+ * Vendor function.
+ */
+
+var vendor = proto.matchesSelector
+  || proto.webkitMatchesSelector
+  || proto.mozMatchesSelector
+  || proto.msMatchesSelector
+  || proto.oMatchesSelector;
+
+/**
+ * Expose `match()`.
+ */
+
+module.exports = match;
+
+/**
+ * Match `el` to `selector`.
+ *
+ * @param {Element} el
+ * @param {String} selector
+ * @return {Boolean}
+ * @api public
+ */
+
+function match(el, selector) {
+  if (vendor) return vendor.call(el, selector);
+  var nodes = query.all(selector, el.parentNode);
+  for (var i = 0; i < nodes.length; ++i) {
+    if (nodes[i] == el) return true;
+  }
+  return false;
+}
+
+});
+require.register("component-delegate/index.js", function(exports, require, module){
+/**
+ * Module dependencies.
+ */
+
+var matches = require('matches-selector')
+  , event = require('event');
+
+/**
+ * Delegate event `type` to `selector`
+ * and invoke `fn(e)`. A callback function
+ * is returned which may be passed to `.unbind()`.
+ *
+ * @param {Element} el
+ * @param {String} selector
+ * @param {String} type
+ * @param {Function} fn
+ * @param {Boolean} capture
+ * @return {Function}
+ * @api public
+ */
+
+exports.bind = function(el, selector, type, fn, capture){
+  return event.bind(el, type, function(e){
+    if (matches(e.target || e.srcElement, selector)) fn.call(el, e);
+  }, capture);
+};
+
+/**
+ * Unbind event `type`'s callback `fn`.
+ *
+ * @param {Element} el
+ * @param {String} type
+ * @param {Function} fn
+ * @param {Boolean} capture
+ * @api public
+ */
+
+exports.unbind = function(el, type, fn, capture){
+  event.unbind(el, type, fn, capture);
+};
+
+});
+require.register("component-object/index.js", function(exports, require, module){
+
+/**
+ * HOP ref.
+ */
+
+var has = Object.prototype.hasOwnProperty;
+
+/**
+ * Return own keys in `obj`.
+ *
+ * @param {Object} obj
+ * @return {Array}
+ * @api public
+ */
+
+exports.keys = Object.keys || function(obj){
+  var keys = [];
+  for (var key in obj) {
+    if (has.call(obj, key)) {
+      keys.push(key);
+    }
+  }
+  return keys;
+};
+
+/**
+ * Return own values in `obj`.
+ *
+ * @param {Object} obj
+ * @return {Array}
+ * @api public
+ */
+
+exports.values = function(obj){
+  var vals = [];
+  for (var key in obj) {
+    if (has.call(obj, key)) {
+      vals.push(obj[key]);
+    }
+  }
+  return vals;
+};
+
+/**
+ * Merge `b` into `a`.
+ *
+ * @param {Object} a
+ * @param {Object} b
+ * @return {Object} a
+ * @api public
+ */
+
+exports.merge = function(a, b){
+  for (var key in b) {
+    if (has.call(b, key)) {
+      a[key] = b[key];
+    }
+  }
+  return a;
+};
+
+/**
+ * Return length of `obj`.
+ *
+ * @param {Object} obj
+ * @return {Number}
+ * @api public
+ */
+
+exports.length = function(obj){
+  return exports.keys(obj).length;
+};
+
+/**
+ * Check if `obj` is empty.
+ *
+ * @param {Object} obj
+ * @return {Boolean}
+ * @api public
+ */
+
+exports.isEmpty = function(obj){
+  return 0 == exports.length(obj);
+};
+});
+require.register("component-view/index.js", function(exports, require, module){
+
+/**
+ * Module dependencies.
+ */
+
+var reactive = require('reactive')
+  , delegate = require('delegate')
+  , object = require('object')
+  , keys = object.keys;
+
+/**
+ * Expose `View`.
+ */
+
+module.exports = View;
+
+/**
+ * Initialize a view with the given `obj` / `el`.
+ *
+ *    function ItemView(item) {
+ *      View.call(this, item, tmpl.cloneNode(true));
+ *    }
+ *
+ * @param {Object} obj
+ * @param {Element} el
+ * @api public
+ */
+
+function View(obj, el) {
+  this.el = el;
+  this.obj = obj;
+  this.view = reactive(el, obj, this);
+  this.bindings = {};
+}
+
+/**
+ * Bind to an event with the given `str`, and invoke `method`:
+ *
+ *    this.bind('click .remove', 'remove')
+ *    this.bind('click .complete', 'complete')
+ *    this.bind('dblclick .info a', 'showDetails')
+ *
+ * @param {String} str
+ * @param {String} method
+ * @api public
+ */
+
+View.prototype.bind = function(str, method){
+  var parts = str.split(' ');
+  var event = parts.shift();
+  var selector = parts.join(' ');
+  var meth = this[method];
+  if (!meth) throw new TypeError('method "' + method + '" is not defined');
+  var fn = delegate.bind(this.el, selector, event, meth.bind(this));
+  this.bindings[str] = fn;
+};
+
+/**
+ * Unbind all listeners, all for a specific event, or 
+ * a specific combination of event / selector.
+ *
+ *    view.unbind()
+ *    view.unbind('click')
+ *    view.unbind('click .remove')
+ *    view.unbind('click .details')
+ *
+ * @param {String} [str]
+ * @api public
+ */
+
+View.prototype.unbind = function(str){
+  if (str) {
+    var fn = this.bindings[str];
+    if (!fn) return;
+    var parts = str.split(' ');
+    var event = parts.shift();
+    delegate.unbind(this.el, event, fn);
+  } else {
+    keys(this.bindings).forEach(this.unbind.bind(this));
+  }
+};
+
+});
+require.register("endpoint-view/index.js", function(exports, require, module){
+// Generated by CoffeeScript 1.6.3
+/* Endpoint-View - View for RESTful API Endpoints
+      -Handles info flowing from Model/Controller
+      -Renders JSON as beautiful HTMLs
+*/
+
+
+(function() {
+  var View;
+
+  View = require('view');
+
+}).call(this);
+
+});
 require.register("rest-api/index.js", function(exports, require, module){
 // Generated by CoffeeScript 1.6.3
 /* rest-api - Controller for calling a RESTful API
@@ -4899,10 +5176,12 @@ require.register("rest-api/index.js", function(exports, require, module){
 
 
 (function() {
-  var Api, Endpoint, reactive,
+  var Api, Endpoint, EndpointView, reactive,
     __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
   Endpoint = require('rest-endpoint');
+
+  EndpointView = require('endpoint-view');
 
   reactive = require('reactive');
 
@@ -5047,6 +5326,42 @@ require.alias("RedVentures-reduce/index.js", "visionmedia-superagent/deps/reduce
 require.alias("visionmedia-superagent/lib/client.js", "visionmedia-superagent/index.js");
 
 require.alias("component-model/lib/index.js", "component-model/index.js");
+
+require.alias("endpoint-view/index.js", "rest-api/deps/endpoint-view/index.js");
+require.alias("component-view/index.js", "endpoint-view/deps/view/index.js");
+require.alias("component-reactive/lib/index.js", "component-view/deps/reactive/lib/index.js");
+require.alias("component-reactive/lib/utils.js", "component-view/deps/reactive/lib/utils.js");
+require.alias("component-reactive/lib/text-binding.js", "component-view/deps/reactive/lib/text-binding.js");
+require.alias("component-reactive/lib/attr-binding.js", "component-view/deps/reactive/lib/attr-binding.js");
+require.alias("component-reactive/lib/binding.js", "component-view/deps/reactive/lib/binding.js");
+require.alias("component-reactive/lib/bindings.js", "component-view/deps/reactive/lib/bindings.js");
+require.alias("component-reactive/lib/adapter.js", "component-view/deps/reactive/lib/adapter.js");
+require.alias("component-reactive/lib/index.js", "component-view/deps/reactive/index.js");
+require.alias("component-format-parser/index.js", "component-reactive/deps/format-parser/index.js");
+
+require.alias("component-props/index.js", "component-reactive/deps/props/index.js");
+require.alias("component-props/index.js", "component-reactive/deps/props/index.js");
+require.alias("component-props/index.js", "component-props/index.js");
+
+require.alias("visionmedia-debug/index.js", "component-reactive/deps/debug/index.js");
+require.alias("visionmedia-debug/debug.js", "component-reactive/deps/debug/debug.js");
+
+require.alias("component-event/index.js", "component-reactive/deps/event/index.js");
+
+require.alias("component-classes/index.js", "component-reactive/deps/classes/index.js");
+require.alias("component-indexof/index.js", "component-classes/deps/indexof/index.js");
+
+require.alias("component-query/index.js", "component-reactive/deps/query/index.js");
+
+require.alias("component-reactive/lib/index.js", "component-reactive/index.js");
+
+require.alias("component-delegate/index.js", "component-view/deps/delegate/index.js");
+require.alias("component-matches-selector/index.js", "component-delegate/deps/matches-selector/index.js");
+require.alias("component-query/index.js", "component-matches-selector/deps/query/index.js");
+
+require.alias("component-event/index.js", "component-delegate/deps/event/index.js");
+
+require.alias("component-object/index.js", "component-view/deps/object/index.js");
 
 require.alias("boot/boot.js", "boot/index.js");
 

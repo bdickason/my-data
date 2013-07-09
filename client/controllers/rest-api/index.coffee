@@ -5,6 +5,7 @@
 ###
 
 Endpoint = require 'rest-endpoint'
+EndpointView = require 'endpoint-view'
 reactive = require 'reactive'
 
 module.exports = class Api
@@ -33,3 +34,4 @@ module.exports = class Api
       console.log values
       console.log endpoint
       reactive values, endpoint   # Template will be bound and will auto-update with new data
+  

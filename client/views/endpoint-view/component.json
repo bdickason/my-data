@@ -1,7 +1,7 @@
 {
-  "name": "rest-api",
+  "name": "endpoint-view",
   "version": "0.0.1",
-  "description": "Rest API Module",
+  "description": "REST API Endpoint View",
   "keywords": [
     "api",
     "request",
@@ -11,12 +11,8 @@
   "scripts": [
     "index.js"
   ],
-  "local": [
-  "rest-endpoint",
-  "endpoint-view"
-  ],
   "dependencies": {
-    "component/reactive": "*"
+    "component/view": "*"
   },
   "license": "MIT"
 }
